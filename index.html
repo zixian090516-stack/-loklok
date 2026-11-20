@@ -7,30 +7,16 @@
 <title>大成loklok 库存管理系统</title>
 <style>
 :root {
---bg: #0f1115;
---surface: #181b21;
---surface-2: #22262f;
---border: #2c313d;
---text: #f3f4f6;
---muted: #9ca3af;
---blue: #2563eb;
---blue-light: #3b82f6;
---red-bg: rgba(239, 68, 68, 0.16);
---red-text: #f87171;
---green-text: #34d399;
+--bg: #0f1115; --surface: #181b21; --surface-2: #22262f; --border: #2c313d;
+--text: #f3f4f6; --muted: #9ca3af; --blue: #2563eb; --blue-light: #3b82f6;
+--red-bg: rgba(239, 68, 68, 0.16); --red-text: #f87171; --green-text: #34d399;
 }
 body.light-mode {
---bg: #f3f4f6;
---surface: #ffffff;
---surface-2: #e5e7eb;
---border: #d1d5db;
---text: #111827;
---muted: #6b7280;
---red-bg: #fee2e2;
---red-text: #dc2626;
---green-text: #059669;
+--bg: #f3f4f6; --surface: #ffffff; --surface-2: #e5e7eb; --border: #d1d5db;
+--text: #111827; --muted: #6b7280; --red-bg: #fee2e2; --red-text: #dc2626; --green-text: #059669;
 }
-• { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+{ box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
 background: var(--bg); color: var(--text);
 font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -40,8 +26,7 @@ min-height: 100vh; transition: background 0.2s, color 0.2s;
 }
 header {
 position: fixed; top: 0; left: 0; right: 0; z-index: 40;
-height: calc(64px + env(safe-area-inset-top));
-padding: env(safe-area-inset-top) 16px 0;
+height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 16px 0;
 background: var(--bg); border-bottom: 1px solid var(--border);
 display: flex; align-items: center; justify-content: space-between;
 }
@@ -143,10 +128,11 @@ padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; opaci
 .info-quote { background: var(--surface-2); border-left: 3px solid var(--blue-light); padding: 10px 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
 
 
-大成 Cempaka
+大成loklok
 最后盘点 -- · 0 个产品
 
 ☀️
+
 和昨天一样
 ⊞
 发送至 WhatsApp (0/0)
@@ -169,6 +155,7 @@ var DEFAULT_CATEGORIES = [
 '蔬菜和菇', '豆类', '培根类', '鸡肉类', '鸭肉类', '猪肉类',
 '蛋类', '海鲜类', '丸类', '香肠类', '肉片类', '馒头类', '其他类', '酱料类'
 ];
+
 var PRESET_PRODUCTS = [
 { id: 'pr_1', name: 'KING OYSTER 杏鲍菇', price: 0.50, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 20, emoji: '🍄' },
 { id: 'pr_2', name: 'BUNA SHIMEIJI 灵芝菇', price: 0.55, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 20, emoji: '🍄' },
@@ -207,7 +194,7 @@ statsView: 'chart',
 products: JSON.parse(localStorage.getItem(K_PRODS) || '[]'),
 records: JSON.parse(localStorage.getItem(K_RECS) || '{}'),
 settings: JSON.parse(localStorage.getItem(K_CFG) || JSON.stringify({
-shopName: '大成 Cempaka',
+shopName: '大成loklok',
 defaultLow: 5,
 whatsapp: '',
 categories: DEFAULT_CATEGORIES
@@ -218,12 +205,12 @@ offset = offset || 0;
 var d = new Date();
 d.setDate(d.getDate() + offset);
 var tz = d.getTimezoneOffset() * 60000;
-return new Date(d.getTime() - tz).toISOString().split('T');
+return new Date(d.getTime() - tz).toISOString().split('T')[0];
 }
 function formatCnDate(dateStr) {
 if (!dateStr) return '--';
 var parts = dateStr.split('-');
-return Number(parts) + '月' + Number(parts) + '日';
+return Number(parts[1]) + '月' + Number(parts[2]) + '日';
 }
 function formatCnDateWeek(dateStr) {
 var weeks = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -299,8 +286,8 @@ return { filled: filled, total: appState.products.length, soldCount: soldCount, 
 }
 function render() {
 var recordedDates = Object.keys(appState.records).sort().reverse();
-var lastDate = recordedDates.length ? formatCnDate(recordedDates) : '暂无';
-document.getElementById('hdrShopName').textContent = appState.settings.shopName || '大成 Cempaka';
+var lastDate = recordedDates.length ? formatCnDate(recordedDates[0]) : '暂无';
+document.getElementById('hdrShopName').textContent = appState.settings.shopName || '大成loklok';
 document.getElementById('hdrSub').textContent = '最后盘点 ' + lastDate + ' · ' + appState.products.length + ' 个产品';
 document.querySelectorAll('.nav-item').forEach(function(el) {
 el.classList.toggle('active', el.dataset.tab === appState.tab);
@@ -453,7 +440,7 @@ var latest = pts[pts.length - 1];
 var minV = Math.min.apply(null, pts);
 var maxV = Math.max.apply(null, pts);
 var bodyHtml = appState.statsView === 'chart'
-? renderSparkline(pts, minV, maxV, dates, dates[dates.length - 1])
+? renderSparkline(pts, minV, maxV, dates[0], dates[dates.length - 1])
 : '区间记录：' + pts.join(' → ') + ' ' + p.unit + '';
 chartRows += '' +
 '' +
@@ -466,7 +453,7 @@ if (!chartRows) {
 chartRows = '所选时间段内暂无盘点走势数据';
 }
 return '' + dayBtns + '' +
-'' + dates + ' — ' + dates[dates.length - 1] + ' · 其中 ' + activeDays.length + ' 天有盘点' +
+'' + dates[0] + ' — ' + dates[dates.length - 1] + ' · 其中 ' + activeDays.length + ' 天有盘点' +
 '' +
 '有盘点的产品' + countedCount + '' +
 '盘点天数' + activeDays.length + '共 ' + appState.statsDays + ' 天' +
@@ -648,7 +635,7 @@ render();
 toast('已自动补齐 ' + cnt + ' 个未动产品');
 }
 function saveSettingsNow() {
-appState.settings.shopName = document.getElementById('setShop').value.trim() || '大成 Cempaka';
+appState.settings.shopName = document.getElementById('setShop').value.trim() || '大成loklok';
 appState.settings.defaultLow = Number(document.getElementById('setLow').value) || 5;
 appState.settings.whatsapp = document.getElementById('setWa').value.replace(/\D/g, '');
 saveStore();
@@ -665,7 +652,7 @@ if (appState.products[i].id === pid) { p = appState.products[i]; break; }
 }
 }
 if (!p) {
-p = { id: '', name: '', price: '', cat: (appState.settings.categories || '蔬菜和菇'), spec: '1 stick', unit: '支', low: appState.settings.defaultLow, img: '' };
+p = { id: '', name: '', price: '', cat: (appState.settings.categories[0] || '蔬菜和菇'), spec: '1 stick', unit: '支', low: appState.settings.defaultLow, img: '' };
 }
 editingProdImg = p.img || '';
 editingProdCat = p.cat;
@@ -741,7 +728,7 @@ editingProdCat = clean;
 openProdEditor(pid || null);
 }
 function handlePhotoUpload(e) {
-var file = e.target.files;
+var file = e.target.files[0];
 if (!file) return;
 var reader = new FileReader();
 reader.onload = function(ev) {
@@ -822,11 +809,11 @@ if (!lines.length) return toast('请先粘贴产品内容');
 var added = 0;
 lines.forEach(function(line, idx) {
 var parts = line.split(/[,，\t]/).map(function(s) { return s.trim(); });
-var name = parts;
+var name = parts[0];
 if (!name) return;
 if (appState.products.some(function(p) { return p.name === name; })) return;
-var price = parseFloat(parts) || 0.50;
-var cat = parts || (appState.settings.categories) || '其他类';
+var price = parseFloat(parts[1]) || 0.50;
+var cat = parts[2] || (appState.settings.categories[0]) || '其他类';
 if (appState.settings.categories.indexOf(cat) === -1) appState.settings.categories.push(cat);
 appState.products.push({
 id: 'p_' + Date.now() + '_' + idx,
@@ -943,11 +930,11 @@ function exportJsonBackup() {
 var blob = new Blob([JSON.stringify({ products: appState.products, records: appState.records, settings: appState.settings }, null, 2)], { type: 'application/json' });
 var a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
-a.download = '大成Cempaka备份_' + getLocalDate(0) + '.json';
+a.download = '大成loklok备份_' + getLocalDate(0) + '.json';
 a.click();
 }
 function importJsonBackup(e) {
-var f = e.target.files;
+var f = e.target.files[0];
 if (!f) return;
 var reader = new FileReader();
 reader.onload = function(ev) {
@@ -975,5 +962,6 @@ render();
 </script>
 </body>
 </html>
+
 
 
