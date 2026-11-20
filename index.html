@@ -3,136 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#121212">
+<meta name="theme-color" content="#0f1115">
 <title>大成loklok 库存管理系统</title>
-  <link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
 <style>
 :root {
-  --bg: #121212;
-  --surface: #1e1e1e;
-  --surface-2: #2c2c2e;
-  --border: #38383a;
-  --text: #ffffff;
-  --muted: #8e8e93;
-  --blue: #0a84ff;
-  --blue-light: #409cff;
-  --red: #ff453a;
-  --red-bg: rgba(255, 69, 58, 0.15);
-  --green: #32d74b;
+--bg: #0f1115; --surface: #181b21; --surface-2: #22262f; --border: #2c313d;
+--text: #f3f4f6; --muted: #9ca3af; --blue: #2563eb; --blue-light: #3b82f6;
+--red-bg: rgba(239, 68, 68, 0.16); --red-text: #f87171; --green-text: #34d399;
 }
+body.light-mode {
+--bg: #f3f4f6; --surface: #ffffff; --surface-2: #e5e7eb; --border: #d1d5db;
+--text: #111827; --muted: #6b7280; --red-bg: #fee2e2; --red-text: #dc2626; --green-text: #059669;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
-  background: var(--bg); color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-  padding-top: calc(60px + env(safe-area-inset-top));
-  padding-bottom: calc(130px + env(safe-area-inset-bottom));
-  min-height: 100vh; transition: background .2s;
+background: var(--bg); color: var(--text);
+font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+padding-top: calc(64px + env(safe-area-inset-top));
+padding-bottom: calc(132px + env(safe-area-inset-bottom));
+min-height: 100vh; transition: background 0.2s, color 0.2s;
 }
 header {
-  position: fixed; top:0; left:0; right:0; z-index:40;
-  height: calc(60px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 16px 0;
-  background: var(--bg); display:flex; align-items:center; justify-content:space-between;
+position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 16px 0;
+background: var(--bg); border-bottom: 1px solid var(--border);
+display: flex; align-items: center; justify-content: space-between;
 }
-.shop-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-.shop-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.shop-title { font-size: 19px; font-weight: 800; }
+.shop-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .theme-btn {
-  width: 36px; height: 36px; border-radius: 50%; border: none;
-  background: var(--surface-2); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer;
+width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+background: var(--surface); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
-main { max-width: 600px; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 14px; }
+main { max-width: 600px; margin: 0 auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
 #floatingBar {
-  position: fixed; left: 0; right: 0; bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 35;
-  background: var(--bg); padding: 10px 16px; display: flex; gap: 10px;
+position: fixed; left: 0; right: 0; bottom: calc(62px + env(safe-area-inset-bottom)); z-index: 35;
+background: var(--bg); border-top: 1px solid var(--border); padding: 8px 14px;
 }
+.float-inner { max-width: 600px; margin: 0 auto; display: flex; gap: 8px; align-items: center; }
 nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
-  height: calc(64px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
-  background: var(--bg); border-top: 1px solid var(--border);
-  display: grid; grid-template-columns: repeat(5, 1fr);
+position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+height: calc(62px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
+background: var(--surface); border-top: 1px solid var(--border);
+display: grid; grid-template-columns: repeat(5, 1fr);
 }
 .nav-item {
-  background: none; border: none; color: var(--muted);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  font-size: 10px; font-weight: 600; cursor: pointer;
+background: none; border: none; color: var(--muted);
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+font-size: 11px; font-weight: 600; cursor: pointer;
 }
-.nav-item svg { width: 22px; height: 22px; }
-.nav-item.active { color: var(--blue); }
-.card { background: var(--surface); border-radius: 12px; padding: 16px; }
+.nav-item svg { width: 21px; height: 21px; }
+.nav-item.active { color: var(--blue-light); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+.card-hd { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 input, select, textarea {
-  width: 100%; background: var(--surface-2); border: 1px solid transparent; color: var(--text);
-  border-radius: 10px; padding: 12px 14px; font-size: 16px; outline: none; transition: border .2s;
+width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none;
 }
-input:focus, textarea:focus { border-color: var(--blue); }
+input:focus, textarea:focus { border-color: var(--blue-light); }
 .btn {
-  border: none; border-radius: 10px; padding: 12px 16px; font-size: 15px; font-weight: 600;
-  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+border: none; border-radius: 10px; padding: 11px 14px; font-size: 14px; font-weight: 700;
+cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
 }
-.btn:active { opacity: 0.8; }
+.btn:active { transform: scale(0.98); }
 .btn-blue { background: var(--blue); color: #fff; }
-.btn-dark { background: var(--surface-2); color: var(--text); }
+.btn-dark { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
 .btn-full { width: 100%; }
 .pills-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .pills-row::-webkit-scrollbar { display: none; }
 .pill {
-  white-space: nowrap; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;
-  background: var(--surface-2); color: var(--muted); border: 1px solid transparent; cursor: pointer;
+white-space: nowrap; padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+background: var(--surface-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
 }
-.pill.active { background: var(--blue); color: #fff; }
+.pill.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 .cat-header {
-  background: var(--surface-2); padding: 14px 16px; border-radius: 12px;
-  display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 15px; cursor: pointer;
+background: var(--surface-2); padding: 11px 14px; border-radius: 12px;
+display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 14px; cursor: pointer;
 }
-.p-card { background: var(--surface); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--border); }
-.p-top { display: flex; gap: 14px; align-items: center; }
+.p-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.p-top { display: flex; gap: 12px; align-items: center; }
 .p-thumb {
-  width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
-  background: var(--surface-2); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 24px; overflow: hidden;
+width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+background: var(--surface-2); border: 1px solid var(--border); flex-shrink: 0;
+display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted); overflow: hidden;
 }
 .p-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.low-tag { background: var(--red-bg); color: var(--red); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-left: 8px; vertical-align: middle; }
-.rem-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.low-tag { background: var(--red-bg); color: var(--red-text); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; margin-left: 6px; }
+.rem-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 .rem-input {
-  width: 90px; height: 48px; text-align: center; font-size: 22px; font-weight: 700;
-  border: 2px solid var(--blue); background: var(--surface); border-radius: 12px; padding: 0;
+width: 105px; height: 44px; text-align: center; font-size: 18px; font-weight: 800;
+border: 2px solid var(--blue); background: var(--bg); border-radius: 10px;
 }
-.rem-input:focus { border-color: var(--blue-light); }
-.quick-btns { display: flex; gap: 10px; }
+.quick-btns { display: flex; gap: 8px; }
 .q-btn {
-  padding: 8px 18px; border-radius: 20px; background: var(--surface-2); border: none;
-  color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer;
+padding: 6px 14px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--border);
+color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer;
 }
 .q-btn:active { background: var(--blue); color: #fff; }
-.ws-box { border: 1px dashed var(--border); border-radius: 12px; padding: 12px; margin-top: 4px; }
-.ws-title { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
-.ws-grid { display: grid; grid-template-columns: 80px 1fr; gap: 10px; }
-.ws-label { font-size: 13px; color: var(--muted); align-self: center; }
-.ws-input { text-align: center; font-weight: 600; height: 40px; padding: 8px; }
-.calc-box { background: var(--surface-2); border-radius: 8px; padding: 10px; font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.calc-item { font-weight: 600; color: var(--text); }
-.calc-item.warn { color: var(--red); }
-.calc-item.ok { color: var(--green); }
+.ws-box { border-top: 1px solid var(--border); padding-top: 10px; }
+.ws-grid { display: grid; grid-template-columns: 95px 1fr; gap: 8px; margin-top: 6px; }
+.prog-track { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.prog-fill { height: 100%; background: var(--blue-light); transition: width 0.25s; }
 .modal-bg {
-  position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 60;
-  display: flex; align-items: center; justify-content: center; padding: 16px;
+position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 60;
+display: flex; align-items: center; justify-content: center; padding: 14px;
 }
 .modal-card {
-  background: var(--surface); border-radius: 16px;
-  width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px;
+background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
 }
 .cat-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
-  padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;
-  background: var(--surface-2); color: var(--muted); cursor: pointer;
+padding: 7px 13px; border-radius: 18px; font-size: 13px; font-weight: 600;
+background: var(--surface-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
 }
-.chip.selected { background: var(--blue); color: #fff; }
+.chip.selected { background: var(--blue); color: #fff; border-color: var(--blue); }
 .toast {
-  position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 99;
-  background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600;
-  opacity: 0; pointer-events: none; transition: opacity .2s;
+position: fixed; top: 76px; left: 50%; transform: translateX(-50%); z-index: 99;
+background: #1f2937; color: #fff; border: 1px solid var(--blue-light);
+padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity 0.2s;
 }
 .toast.show { opacity: 1; }
+.info-quote { background: var(--surface-2); border-left: 3px solid var(--blue-light); padding: 10px 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+
+/* 新增的进货与计算公式小框框 */
+.calc-box {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface-2); border-radius: 8px; padding: 8px 12px;
+  font-size: 12px; color: var(--muted); font-weight: 600;
+}
+.calc-item { color: var(--text); }
+.calc-item.green { color: var(--green-text); }
+.calc-item.red { color: var(--red-text); }
 </style>
 </head>
 <body>
@@ -142,16 +147,17 @@ input:focus, textarea:focus { border-color: var(--blue); }
     <div class="shop-title" id="hdrShopName">大成</div>
     <div class="shop-sub" id="hdrSub">最后盘点 -- · 0 个产品</div>
   </div>
-  <button class="theme-btn" onclick="toggleTheme()" title="切换主题">
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-  </button>
+  <button class="theme-btn" onclick="toggleTheme()" title="切换主题">☀️</button>
 </header>
 
 <main id="mainApp"></main>
 
 <div id="floatingBar">
-  <button class="btn btn-dark" style="flex:1; border:1px solid var(--border);" onclick="fillSameAsYesterday()">和昨天一样</button>
-  <button class="btn btn-blue" style="flex:2;" id="btnSendWa" onclick="openWaModal()">发送至 WhatsApp (0/0)</button>
+  <div class="float-inner">
+    <button class="btn btn-dark" style="flex:1" onclick="fillSameAsYesterday()">和昨天一样</button>
+    <button class="btn btn-dark" onclick="toggleCollapseAll()" style="padding:11px 14px;">⊞</button>
+    <button class="btn btn-blue" style="flex:1.5" id="btnSendWa" onclick="openWaModal()">发送至 WhatsApp (0/0)</button>
+  </div>
 </div>
 
 <nav>
@@ -181,37 +187,36 @@ input:focus, textarea:focus { border-color: var(--blue); }
 <div id="modalLayer"></div>
 
 <script>
-// ================= 基础数据 =================
 var DEFAULT_CATEGORIES = ['蔬菜和菇','豆类','培根类','鸡肉类','鸭肉类','猪肉类','蛋类','海鲜类','丸类','香肠类','肉片类','馒头类','其他类','酱料类'];
 
 var PRESET_PRODUCTS = [
-  { id:'p1', name:'KING OYSTER 杏鲍菇', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🍄', packQty:10, packCost:3.50 },
-  { id:'p2', name:'BUNA SHIMEIJI 灵芝菇', price:0.55, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🍄', packQty:20, packCost:6.00 },
-  { id:'p3', name:'SHITAKE 花菇', price:0.60, cat:'蔬菜和菇', spec:'1 stick*2', unit:'支', low:20, emoji:'🍄', packQty:1, packCost:0 },
-  { id:'p4', name:'JAGUNG 玉蜀黍（大）', price:0.60, cat:'蔬菜和菇', spec:'10 Sticks/bag', unit:'支', low:20, emoji:'🌽', packQty:10, packCost:5.00 },
-  { id:'p5', name:'WHITE BUTTON MUSHROOM 白蘑菇', price:0.55, cat:'蔬菜和菇', spec:'20 Sticks/bag', unit:'支', low:20, emoji:'🍄', packQty:20, packCost:9.00 },
-  { id:'p6', name:'KACANG PANJANG 长豆', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🥬', packQty:1, packCost:0 },
-  { id:'p7', name:'BENDI 羊角豆', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🥬', packQty:1, packCost:0 },
-  { id:'p8', name:'BABY BRINJAL 茄子', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:15, emoji:'🍆', packQty:1, packCost:0 },
-  { id:'p9', name:'ABALONE MUSHROOM 鲍鱼菇', price:0.55, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:15, emoji:'🍄', packQty:1, packCost:0 },
-  { id:'p10', name:'BROCCOLI 西兰花', price:0.60, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:15, emoji:'🥦', packQty:1, packCost:0 },
-  { id:'p11', name:'TAU POK 豆卜', price:0.50, cat:'豆类', spec:'1 stick', unit:'支', low:20, emoji:'🟨', packQty:1, packCost:0 },
-  { id:'p12', name:'FU CHUK 炸腐竹', price:0.60, cat:'豆类', spec:'1 stick', unit:'支', low:20, emoji:'捲', packQty:1, packCost:0 },
-  { id:'p13', name:'BACON ENOKI 培根金针菇', price:1.20, cat:'培根类', spec:'1 stick', unit:'支', low:15, emoji:'🥓', packQty:1, packCost:0 },
-  { id:'p14', name:'SMOKED DUCK 烟熏鸭胸', price:1.20, cat:'鸭肉类', spec:'1 stick', unit:'支', low:15, emoji:'🦆', packQty:1, packCost:0 },
-  { id:'p15', name:'CHICKEN MID WING 鸡中翅', price:1.50, cat:'鸡肉类', spec:'1 stick', unit:'支', low:15, emoji:'🍗', packQty:1, packCost:0 },
-  { id:'p16', name:'PORK BELLY 五花肉片', price:1.20, cat:'猪肉类', spec:'1 stick', unit:'支', low:15, emoji:'🥩', packQty:1, packCost:0 },
-  { id:'p17', name:'QUAIL EGG 鹌鹑蛋', price:0.80, cat:'蛋类', spec:'1 stick3', unit:'支', low:15, emoji:'🥚', packQty:1, packCost:0 },
-  { id:'p18', name:'PRAWN 鲜虾串', price:1.50, cat:'海鲜类', spec:'1 stick', unit:'支', low:15, emoji:'🦐', packQty:1, packCost:0 },
-  { id:'p19', name:'75 MEATBALL 肉丸', price:0.60, cat:'丸类', spec:'1 stick3', unit:'支', low:20, emoji:'🍡', packQty:1, packCost:0 },
-  { id:'p20', name:'CHEESE TOFU 芝士豆腐', price:0.70, cat:'丸类', spec:'1 stick2', unit:'支', low:20, emoji:'🧀', packQty:1, packCost:0 },
-  { id:'p21', name:'TAIWAN SAUSAGE 台湾香肠', price:1.20, cat:'香肠类', spec:'1 stick', unit:'支', low:15, emoji:'🌭', packQty:1, packCost:0 },
-  { id:'p22', name:'MANTOU 黄金小馒头', price:0.60, cat:'馒头类', spec:'1 stick*2', unit:'支', low:15, emoji:'🥯', packQty:1, packCost:0 }
+  { id:'pr_1',  name:'KING OYSTER 杏鲍菇', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🍄', packQty:10, packCost:3.50 },
+  { id:'pr_2',  name:'BUNA SHIMEIJI 灵芝菇', price:0.55, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🍄', packQty:20, packCost:6.00 },
+  { id:'pr_3',  name:'SHITAKE 花菇', price:0.60, cat:'蔬菜和菇', spec:'1 stick2', unit:'支', low:20, emoji:'🍄', packQty:1, packCost:0 },
+  { id:'pr_4',  name:'JAGUNG 玉蜀黍（大）', price:0.60, cat:'蔬菜和菇', spec:'10 Sticks/bag', unit:'支', low:20, emoji:'🌽', packQty:10, packCost:0 },
+  { id:'pr_5',  name:'WHITE BUTTON MUSHROOM 白蘑菇', price:0.55, cat:'蔬菜和菇', spec:'20 Sticks/bag', unit:'支', low:20, emoji:'🍄', packQty:20, packCost:0 },
+  { id:'pr_6',  name:'KACANG PANJANG 长豆', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🥬', packQty:1, packCost:0 },
+  { id:'pr_7',  name:'BENDI 羊角豆', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:20, emoji:'🥬', packQty:1, packCost:0 },
+  { id:'pr_8',  name:'BABY BRINJAL 茄子', price:0.50, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:15, emoji:'🍆', packQty:1, packCost:0 },
+  { id:'pr_9',  name:'ABALONE MUSHROOM 鲍鱼菇', price:0.55, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:15, emoji:'🍄', packQty:1, packCost:0 },
+  { id:'pr_10', name:'BROCCOLI 西兰花', price:0.60, cat:'蔬菜和菇', spec:'1 stick', unit:'支', low:15, emoji:'🥦', packQty:1, packCost:0 },
+  { id:'pr_11', name:'TAU POK 豆卜', price:0.50, cat:'豆类', spec:'1 stick', unit:'支', low:20, emoji:'🟨', packQty:1, packCost:0 },
+  { id:'pr_12', name:'FU CHUK 炸腐竹', price:0.60, cat:'豆类', spec:'1 stick', unit:'支', low:20, emoji:'捲', packQty:1, packCost:0 },
+  { id:'pr_13', name:'BACON ENOKI 培根金针菇', price:1.20, cat:'培根类', spec:'1 stick', unit:'支', low:15, emoji:'🥓', packQty:1, packCost:0 },
+  { id:'pr_14', name:'SMOKED DUCK 烟熏鸭胸', price:1.20, cat:'鸭肉类', spec:'1 stick', unit:'支', low:15, emoji:'🦆', packQty:1, packCost:0 },
+  { id:'pr_15', name:'CHICKEN MID WING 鸡中翅', price:1.50, cat:'鸡肉类', spec:'1 stick', unit:'支', low:15, emoji:'🍗', packQty:1, packCost:0 },
+  { id:'pr_16', name:'PORK BELLY 五花肉片', price:1.20, cat:'猪肉类', spec:'1 stick', unit:'支', low:15, emoji:'🥩', packQty:1, packCost:0 },
+  { id:'pr_17', name:'QUAIL EGG 鹌鹑蛋', price:0.80, cat:'蛋类', spec:'1 stick3', unit:'支', low:15, emoji:'🥚', packQty:1, packCost:0 },
+  { id:'pr_18', name:'PRAWN 鲜虾串', price:1.50, cat:'海鲜类', spec:'1 stick', unit:'支', low:15, emoji:'🦐', packQty:1, packCost:0 },
+  { id:'pr_19', name:'75 MEATBALL 肉丸', price:0.60, cat:'丸类', spec:'1 stick3', unit:'支', low:20, emoji:'🍡', packQty:1, packCost:0 },
+  { id:'pr_20', name:'CHEESE TOFU 芝士豆腐', price:0.70, cat:'丸类', spec:'1 stick2', unit:'支', low:20, emoji:'🧀', packQty:1, packCost:0 },
+  { id:'pr_21', name:'TAIWAN SAUSAGE 台湾香肠', price:1.20, cat:'香肠类', spec:'1 stick', unit:'支', low:15, emoji:'🌭', packQty:1, packCost:0 },
+  { id:'pr_22', name:'MANTOU 黄金小馒头', price:0.60, cat:'馒头类', spec:'1 stick*2', unit:'支', low:15, emoji:'🥯', packQty:1, packCost:0 }
 ];
 
-var K_PRODS = 'dc_v3_products';
-var K_RECS  = 'dc_v3_records';
-var K_CFG   = 'dc_v3_settings';
+var K_PRODS = 'dc_v4_products';
+var K_RECS  = 'dc_v4_records';
+var K_CFG   = 'dc_v4_settings';
 
 var appState = {
   tab: 'count',
@@ -222,6 +227,7 @@ var appState = {
   collapsedCats: {},
   statsDays: 7,
   statsView: 'chart',
+  purchaseUnit: {},
   products: JSON.parse(localStorage.getItem(K_PRODS) || '[]'),
   records: JSON.parse(localStorage.getItem(K_RECS) || '{}'),
   settings: JSON.parse(localStorage.getItem(K_CFG) || JSON.stringify({
@@ -230,7 +236,6 @@ var appState = {
 };
 if (!appState.settings.categories) appState.settings.categories = DEFAULT_CATEGORIES.slice();
 
-// ================= 工具函数 =================
 function getLocalDate(offset) {
   offset = offset || 0;
   var d = new Date();
@@ -242,6 +247,11 @@ function formatCnDate(dateStr) {
   if (!dateStr) return '--';
   var parts = dateStr.split('-');
   return Number(parts[1]) + '月' + Number(parts[2]) + '日';
+}
+function formatCnDateWeek(dateStr) {
+  var weeks = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+  var dt = new Date(dateStr + 'T00:00:00');
+  return formatCnDate(dateStr) + weeks[dt.getDay()];
 }
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -255,23 +265,29 @@ function toast(msg) {
   var el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 2200);
+  setTimeout(function() { el.classList.remove('show'); }, 2200);
 }
-function toggleTheme() { /* 保持截图暗黑风格，不做亮色切换了，避免破坏美感 */ toast('当前为深色模式'); }
+function toggleTheme() { document.body.classList.toggle('light-mode'); }
+
 function getProd(pid) {
   for (var i = 0; i < appState.products.length; i++) if (appState.products[i].id === pid) return appState.products[i];
   return null;
 }
 function getLastRecordBefore(prodId, dateStr) {
-  var prevDates = Object.keys(appState.records).filter(function(d){ return d < dateStr; }).sort().reverse();
+  var prevDates = Object.keys(appState.records).filter(function(d) { return d < dateStr; }).sort().reverse();
   for (var i = 0; i < prevDates.length; i++) {
     var d = prevDates[i];
     var r = appState.records[d] && appState.records[d][prodId];
-    if (r && r.rem !== '' && r.rem !== undefined && r.rem !== null) return { date: d, rem: Number(r.rem) };
+    if (r && r.rem !== '' && r.rem !== undefined && r.rem !== null) {
+      return { date: d, rem: Number(r.rem) };
+    }
   }
   return null;
 }
-function isDateEditable(dateStr) { return dateStr >= getLocalDate(-2); }
+function isDateEditable(dateStr) {
+  var minEditable = getLocalDate(-2);
+  return dateStr >= minEditable;
+}
 function getPurchase(dateStr, pid) {
   var r = appState.records[dateStr] && appState.records[dateStr][pid];
   return (r && r.purchase) ? r.purchase : null;
@@ -280,7 +296,7 @@ function getPurchase(dateStr, pid) {
 function calcDayStats(dateStr) {
   var dayMap = appState.records[dateStr] || {};
   var filled = 0, soldCount = 0, purchaseQty = 0, purchaseCost = 0, wasteCount = 0, wasteAmt = 0, salesAmt = 0;
-  appState.products.forEach(function(p){
+  appState.products.forEach(function(p) {
     var r = dayMap[p.id];
     var pc = getPurchase(dateStr, p.id);
     var pq = pc ? Number(pc.qty) : 0;
@@ -296,22 +312,27 @@ function calcDayStats(dateStr) {
       }
     }
     if (r && Number(r.waste) > 0) {
-      wasteCount += Number(r.waste);
-      wasteAmt += Number(r.waste) * p.price;
+      var w = Number(r.waste);
+      wasteCount += w;
+      wasteAmt += w * p.price;
     }
   });
   return { filled: filled, total: appState.products.length, soldCount: soldCount, salesAmt: salesAmt, purchaseQty: purchaseQty, purchaseCost: purchaseCost, wasteCount: wasteCount, wasteAmt: wasteAmt };
 }
 
-// ================= 渲染路由 =================
 function render() {
   var recordedDates = Object.keys(appState.records).sort().reverse();
   var lastDate = recordedDates.length ? formatCnDate(recordedDates[0]) : '暂无';
-  document.getElementById('hdrShopName').textContent = appState.settings.shopName || '大成';
-  document.getElementById('hdrSub').textContent = '最后盘点 ' + lastDate + ' · ' + appState.products.length + ' 个产品';
+  var h1 = document.getElementById('hdrShopName'), h2 = document.getElementById('hdrSub');
+  if (h1) h1.textContent = appState.settings.shopName || '大成';
+  if (h2) h2.textContent = '最后盘点 ' + lastDate + ' · ' + appState.products.length + ' 个产品';
 
-  document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.toggle('active', el.dataset.tab === appState.tab); });
-  document.getElementById('floatingBar').style.display = (appState.tab === 'count') ? 'flex' : 'none';
+  document.querySelectorAll('.nav-item').forEach(function(el) {
+    el.classList.toggle('active', el.dataset.tab === appState.tab);
+  });
+  
+  var fb = document.getElementById('floatingBar');
+  if (fb) fb.style.display = (appState.tab === 'count') ? 'block' : 'none';
 
   var main = document.getElementById('mainApp');
   if (appState.tab === 'count') main.innerHTML = viewCount();
@@ -321,194 +342,240 @@ function render() {
   else if (appState.tab === 'settings') main.innerHTML = viewSettings();
 }
 
-// ================= 盘点页面 =================
+/* ================= 盘点页 ================= */
 function viewCount() {
   var stats = calcDayStats(appState.date);
   var editable = isDateEditable(appState.date);
+  var pct = stats.total ? Math.round((stats.filled / stats.total) * 100) : 0;
   var btn = document.getElementById('btnSendWa');
   if (btn) btn.textContent = '发送至 WhatsApp (' + stats.filled + '/' + stats.total + ')';
 
   var cats = appState.settings.categories || DEFAULT_CATEGORIES;
-  var filtered = appState.products.filter(function(p){
-    return (appState.selectedCat === 'ALL' || p.cat === appState.selectedCat) && p.name.toLowerCase().indexOf(appState.search.toLowerCase()) > -1;
+  var filtered = appState.products.filter(function(p) {
+    var matchCat = appState.selectedCat === 'ALL' || p.cat === appState.selectedCat;
+    var matchKw = p.name.toLowerCase().indexOf(appState.search.toLowerCase()) > -1;
+    return matchCat && matchKw;
   });
   var groups = {};
-  filtered.forEach(function(p){ if (!groups[p.cat]) groups[p.cat] = []; groups[p.cat].push(p); });
+  filtered.forEach(function(p) { if (!groups[p.cat]) groups[p.cat] = []; groups[p.cat].push(p); });
+  var allExpanded = cats.every(function(c) { return !appState.collapsedCats[c]; });
 
-  var html = '<div class="card" style="padding:12px;display:flex;gap:12px;align-items:center;">' +
-    '<div style="font-size:15px;font-weight:600;white-space:nowrap;">盘点日期</div>' +
-    '<input type="date" value="' + appState.date + '" onchange="changeDate(this.value)" style="background:transparent;border:none;font-size:16px;font-weight:600;color:var(--blue);padding:0;">' +
-    '<div style="flex:1;text-align:right;font-size:13px;color:var(--muted);">已填 ' + stats.filled + ' / ' + stats.total + '</div>' +
+  var html = '';
+  if (!editable) html += '<div class="info-quote" style="border-left-color:#f59e0b;">🔒 历史日期只读模式（仅支持修改今天、昨天、前天）</div>';
+
+  html += '<div class="card">' +
+    '<div class="card-hd"><span>盘点日期</span><span style="font-size:12px;color:var(--muted);">已填 ' + stats.filled + ' / ' + stats.total + '</span></div>' +
+    '<input type="date" value="' + appState.date + '" onchange="changeDate(this.value)">' +
+    '<div class="prog-track"><div class="prog-fill" style="width:' + pct + '%"></div></div>' +
   '</div>';
 
-  html += '<div style="display:flex;gap:10px;">' +
-    '<input type="text" placeholder="搜寻产品..." value="' + esc(appState.search) + '" oninput="setSearch(this.value)" style="flex:1;">' +
-    '<button class="btn btn-dark" style="padding:0 16px;" onclick="toggleCollapseAll()">⊞</button>' +
+  html += '<div style="display:flex;gap:8px;align-items:center;">' +
+    '<button class="btn btn-dark btn-sm" onclick="toggleCollapseAll()">' + (allExpanded ? '全部收起' : '全部展开') + '</button>' +
+    '<input type="text" placeholder="🔍 搜索产品…" value="' + esc(appState.search) + '" oninput="setSearch(this.value)" style="flex:1;">' +
   '</div>';
 
-  html += '<div class="pills-row"><button class="pill ' + (appState.selectedCat === 'ALL' ? 'active' : '') + '" onclick="selectCat(\'ALL\')">全部</button>';
-  cats.forEach(function(c){ html += '<button class="pill ' + (appState.selectedCat === c ? 'active' : '') + '" onclick="selectCat(\'' + esc(c) + '\')">' + esc(c) + '</button>'; });
+  html += '<div class="pills-row">' +
+    '<button class="pill ' + (appState.selectedCat === 'ALL' ? 'active' : '') + '" onclick="selectCat(\'ALL\')">全部</button>';
+  cats.forEach(function(c) {
+    html += '<button class="pill ' + (appState.selectedCat === c ? 'active' : '') + '" onclick="selectCat(\'' + esc(c) + '\')">' + esc(c) + '</button>';
+  });
   html += '</div>';
 
   if (appState.products.length === 0) {
-    html += '<div class="card" style="text-align:center;padding:30px;"><button class="btn btn-blue btn-full" onclick="loadPresetList()">载入完整产品清单</button></div>';
+    html += '<div class="card" style="text-align:center;padding:24px;">' +
+      '<div style="font-size:36px;margin-bottom:8px;">📦</div>' +
+      '<div style="font-weight:700;margin-bottom:6px;">还没有任何产品</div>' +
+      '<div style="color:var(--muted);font-size:13px;margin-bottom:14px;">一键载入预设清单，或到「产品」页新增。</div>' +
+      '<button class="btn btn-blue btn-full" onclick="loadPresetList()">✨ 载入全部预设产品清单</button>' +
+    '</div>';
   }
 
-  Object.keys(groups).forEach(function(cat){
+  Object.keys(groups).forEach(function(cat) {
     var items = groups[cat];
-    var done = items.filter(function(p){ var r = appState.records[appState.date] && appState.records[appState.date][p.id]; return r && r.rem !== ''; }).length;
+    var doneInCat = items.filter(function(p) {
+      var r = appState.records[appState.date] && appState.records[appState.date][p.id];
+      return r && r.rem !== '' && r.rem !== undefined;
+    }).length;
     var isCollapsed = !!appState.collapsedCats[cat];
     html += '<div class="cat-header" onclick="toggleCat(\'' + esc(cat) + '\')">' +
-      '<div>' + (isCollapsed ? '▸' : '▾') + ' &nbsp;' + esc(cat) + '</div><div style="color:var(--muted);font-size:13px;">' + done + ' / ' + items.length + '</div></div>';
-    if (!isCollapsed) items.forEach(function(p){ html += renderCountCard(p, editable); });
+      '<div>' + (isCollapsed ? '▸' : '▾') + ' &nbsp;' + esc(cat) + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);font-weight:600;">' + doneInCat + ' / ' + items.length + '</div>' +
+    '</div>';
+    if (!isCollapsed) items.forEach(function(p) { html += renderCountCard(p, editable); });
   });
   return html;
 }
 
 function renderCountCard(p, editable) {
   var rec = (appState.records[appState.date] && appState.records[appState.date][p.id]) || {};
-  var pc = getPurchase(appState.date, p.id) || { qty: 0 };
   var prev = getLastRecordBefore(p.id, appState.date);
-  var hasRem = rec.rem !== '' && rec.rem !== undefined;
+  var pc = getPurchase(appState.date, p.id);
+  var pq = pc ? Number(pc.qty) : 0;
+
+  var hasRem = rec.rem !== '' && rec.rem !== undefined && rec.rem !== null;
   var isLow = hasRem && Number(rec.rem) <= p.low;
   var disAttr = !editable ? 'disabled' : '';
-
-  var thumb = p.img ? '<img src="' + p.img + '">' : (p.emoji || '🍢');
-  var prevText = prev ? ('上次' + formatCnDate(prev.date) + '是 ' + prev.rem + ' ' + p.unit) : '首次盘点';
+  var thumbHtml = p.img ? '<img src="' + p.img + '" alt="">' : (p.emoji || '🍢');
+  var prevText = prev ? ('上次 ' + formatCnDate(prev.date) + ' 是 ' + prev.rem + ' ' + p.unit) : '首次盘点';
   var lowHtml = isLow ? '<span class="low-tag">库存偏低</span>' : '';
 
-  // 推算销售逻辑
-  var sold = '';
-  if (prev && hasRem) {
-    var calc = prev.rem + pc.qty - Number(rec.waste||0) - Number(rec.rem);
-    sold = '<span class="calc-item ' + (calc < 0 ? 'warn' : 'ok') + '">推算销售: ' + calc + ' 支</span>';
-  } else {
-    sold = '<span class="calc-item" style="color:var(--muted);">推算销售: -</span>';
+  var quickHtml = '';
+  if (editable) {
+    quickHtml = '<div class="quick-btns">' +
+      '<button class="q-btn" onclick="quickSetRem(\'' + p.id + '\',\'10\')">10</button>' +
+      '<button class="q-btn" onclick="quickSetRem(\'' + p.id + '\',\'30\')">30</button>' +
+      '<button class="q-btn" onclick="quickSetRem(\'' + p.id + '\',\'50\')">50</button>' +
+    '</div>';
   }
 
-  var calcHtml = '<div class="calc-box">' +
-    '<span>上次: ' + (prev ? prev.rem : '-') + '</span>' +
-    '<span>+ 进货: ' + pc.qty + '</span>' +
-    '<span>- 损耗: ' + (rec.waste||0) + '</span>' +
-    sold +
-  '</div>';
+  // 加入透明计算逻辑框
+  var soldAmt = '';
+  var startQty = prev ? prev.rem : 0;
+  var wasteAmt = Number(rec.waste || 0);
+  
+  if (prev && hasRem) {
+    var soldNum = startQty + pq - wasteAmt - Number(rec.rem);
+    soldAmt = '<div class="calc-box">' +
+      '<span class="calc-item">上次: ' + startQty + '</span>' +
+      '<span>+ 进货: ' + pq + '</span>' +
+      '<span>- 损耗: ' + wasteAmt + '</span>' +
+      '<span class="calc-item ' + (soldNum < 0 ? 'red' : 'green') + '">推算卖: ' + soldNum + '</span>' +
+    '</div>';
+  } else {
+    soldAmt = '<div class="calc-box"><span class="calc-item">上次: ' + (prev ? startQty : '-') + '</span><span>+ 进货: ' + pq + '</span><span>- 损耗: ' + wasteAmt + '</span><span class="calc-item">推算卖: -</span></div>';
+  }
 
   return '<div class="p-card">' +
     '<div class="p-top">' +
-      '<div class="p-thumb">' + thumb + '</div>' +
+      '<div class="p-thumb">' + thumbHtml + '</div>' +
       '<div style="flex:1;min-width:0;">' +
-        '<div style="font-weight:700;font-size:16px;">' + esc(p.name) + '</div>' +
-        '<div style="font-size:13px;color:var(--muted);margin-top:4px;">' + esc(p.cat) + '  RM ' + Number(p.price).toFixed(2) + '  ' + esc(p.spec) + '</div>' +
-        '<div style="font-size:12px;color:var(--muted);margin-top:4px;">' + prevText + lowHtml + '</div>' +
+        '<div style="font-weight:700;font-size:15px;">' + esc(p.name) + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:3px;">RM ' + Number(p.price).toFixed(2) + ' · ' + esc(p.spec || '1 stick') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-top:3px;">' + prevText + lowHtml + '</div>' +
       '</div>' +
-      '<div style="text-align:right;">' +
-        '<div style="font-size:16px;font-weight:700;color:var(--blue);">今日进货</div>' +
-        '<div style="font-size:14px;font-weight:600;">' + pc.qty + ' 支</div>' +
-      '</div>' +
+      (pq > 0 ? '<div style="text-align:right;"><div style="font-size:11px;color:var(--blue-light);font-weight:700;">今日进货</div><div style="font-size:13px;font-weight:700;">' + pq + ' ' + p.unit + '</div></div>' : '') +
     '</div>' +
     '<div class="rem-row">' +
-      '<span style="font-size:14px;color:var(--muted);">剩余数量:</span>' +
+      '<span style="font-size:13px;color:var(--muted);">剩余数量:</span>' +
       '<input type="number" min="0" class="rem-input" ' + disAttr + ' value="' + (hasRem ? rec.rem : '') + '" placeholder="-" onchange="updateRec(\'' + p.id + '\',\'rem\',this.value)">' +
-      '<span style="font-size:14px;color:var(--muted);">' + esc(p.unit) + '</span>' +
+      '<span style="font-size:13px;color:var(--muted);">' + esc(p.unit) + '</span>' +
     '</div>' +
-    '<div class="quick-btns">' +
-      '<button class="q-btn" ' + disAttr + ' onclick="quickSetRem(\'' + p.id + '\',\'10\')">10</button>' +
-      '<button class="q-btn" ' + disAttr + ' onclick="quickSetRem(\'' + p.id + '\',\'30\')">30</button>' +
-      '<button class="q-btn" ' + disAttr + ' onclick="quickSetRem(\'' + p.id + '\',\'50\')">50</button>' +
-    '</div>' +
+    quickHtml +
     '<div class="ws-box">' +
-      '<div class="ws-title">损耗 WS</div>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--muted);">损耗 WS</div>' +
       '<div class="ws-grid">' +
-        '<div class="ws-label">个数</div>' +
-        '<input type="number" min="0" class="ws-input" ' + disAttr + ' style="width:80px;" value="' + (rec.waste || 0) + '" onchange="updateRec(\'' + p.id + '\',\'waste\',this.value)">' +
-        '<div class="ws-label">原因</div>' +
-        '<input type="text" class="ws-input" ' + disAttr + ' placeholder="原因（可不填）" value="' + esc(rec.wasteReason || '') + '" onchange="updateRec(\'' + p.id + '\',\'wasteReason\',this.value)">' +
+        '<span style="font-size:12px;color:var(--muted);align-self:center;">个数</span>' +
+        '<input type="number" min="0" ' + disAttr + ' style="text-align:center;font-weight:700;" value="' + (rec.waste || 0) + '" onchange="updateRec(\'' + p.id + '\',\'waste\',this.value)">' +
+        '<span style="font-size:12px;color:var(--muted);align-self:center;">原因</span>' +
+        '<input type="text" ' + disAttr + ' placeholder="原因（可不填）" value="' + esc(rec.wasteReason || '') + '" onchange="updateRec(\'' + p.id + '\',\'wasteReason\',this.value)">' +
       '</div>' +
     '</div>' +
-    calcHtml +
+    soldAmt +
   '</div>';
 }
 
-// ================= 进货页面 =================
+/* ================= 进货页 ================= */
 function viewPurchase() {
   var editable = isDateEditable(appState.purchaseDate);
   var cats = appState.settings.categories || DEFAULT_CATEGORIES;
-  var filtered = appState.products.filter(function(p){
-    return (appState.selectedCat === 'ALL' || p.cat === appState.selectedCat) && p.name.toLowerCase().indexOf(appState.search.toLowerCase()) > -1;
+  var filtered = appState.products.filter(function(p) {
+    var matchCat = appState.selectedCat === 'ALL' || p.cat === appState.selectedCat;
+    var matchKw = p.name.toLowerCase().indexOf(appState.search.toLowerCase()) > -1;
+    return matchCat && matchKw;
   });
   var groups = {};
-  filtered.forEach(function(p){ if (!groups[p.cat]) groups[p.cat] = []; groups[p.cat].push(p); });
+  filtered.forEach(function(p) { if (!groups[p.cat]) groups[p.cat] = []; groups[p.cat].push(p); });
 
   var totQty = 0, totCost = 0;
-  appState.products.forEach(function(p){
+  appState.products.forEach(function(p) {
     var pc = getPurchase(appState.purchaseDate, p.id);
     if (pc) { totQty += Number(pc.qty) || 0; totCost += Number(pc.totalCost) || 0; }
   });
 
-  var html = '<div class="card" style="padding:16px;">' +
-    '<div style="display:flex;justify-content:space-between;margin-bottom:12px;">' +
-      '<div style="font-size:16px;font-weight:700;">今日进货录入</div>' +
-      '<div style="font-size:14px;font-weight:600;color:var(--green);">成本 RM ' + totCost.toFixed(2) + '</div>' +
+  var html = '';
+  if (!editable) html += '<div class="info-quote" style="border-left-color:#f59e0b;">🔒 历史进货只读（仅支持修改今天、昨天、前天）</div>';
+
+  html += '<div class="card">' +
+    '<div class="card-hd"><span>进货日期</span><span style="font-size:12px;color:var(--muted);">今日合计 ' + totQty + ' 支</span></div>' +
+    '<input type="date" value="' + appState.purchaseDate + '" onchange="changePurchaseDate(this.value)">' +
+    '<div class="calc-box" style="margin-top:10px;">' +
+      '<span class="calc-item">进货总数: ' + totQty + '</span>' +
+      '<span class="calc-item green">总成本: RM ' + totCost.toFixed(2) + '</span>' +
     '</div>' +
-    '<input type="date" value="' + appState.purchaseDate + '" onchange="changePurchaseDate(this.value)" style="background:var(--surface-2);padding:10px;border-radius:8px;">' +
   '</div>';
 
-  html += '<div style="display:flex;gap:10px;">' +
-    '<input type="text" placeholder="搜寻产品..." value="' + esc(appState.search) + '" oninput="setSearch(this.value)" style="flex:1;">' +
+  html += '<div style="display:flex;gap:8px;align-items:center;">' +
+    '<input type="text" placeholder="🔍 搜索产品…" value="' + esc(appState.search) + '" oninput="setSearch(this.value)" style="flex:1;">' +
   '</div>';
 
-  html += '<div class="pills-row"><button class="pill ' + (appState.selectedCat === 'ALL' ? 'active' : '') + '" onclick="selectCat(\'ALL\')">全部</button>';
-  cats.forEach(function(c){ html += '<button class="pill ' + (appState.selectedCat === c ? 'active' : '') + '" onclick="selectCat(\'' + esc(c) + '\')">' + esc(c) + '</button>'; });
+  html += '<div class="pills-row">' +
+    '<button class="pill ' + (appState.selectedCat === 'ALL' ? 'active' : '') + '" onclick="selectCat(\'ALL\')">全部</button>';
+  cats.forEach(function(c) {
+    html += '<button class="pill ' + (appState.selectedCat === c ? 'active' : '') + '" onclick="selectCat(\'' + esc(c) + '\')">' + esc(c) + '</button>';
+  });
   html += '</div>';
 
-  if (appState.products.length === 0) return html;
+  if (appState.products.length === 0) {
+    html += '<div class="card" style="text-align:center;padding:24px;">' +
+      '<div style="font-size:36px;margin-bottom:8px;">📦</div>' +
+      '<div style="font-weight:700;margin-bottom:6px;">还没有任何产品</div>' +
+      '<button class="btn btn-blue btn-full" onclick="loadPresetList()">✨ 载入全部预设产品清单</button>' +
+    '</div>';
+    return html;
+  }
 
-  Object.keys(groups).forEach(function(cat){
+  Object.keys(groups).forEach(function(cat) {
     var items = groups[cat];
-    html += '<div class="cat-header" style="cursor:default;"><div>' + esc(cat) + '</div></div>';
-    items.forEach(function(p){ html += renderPurchaseCard(p, editable); });
+    html += '<div class="cat-header" style="cursor:default;">' +
+      '<div>' + esc(cat) + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);font-weight:600;">' + items.length + ' 项</div>' +
+    '</div>';
+    items.forEach(function(p) { html += renderPurchaseCard(p, editable); });
   });
   return html;
 }
 
 function renderPurchaseCard(p, editable) {
-  var pc = getPurchase(appState.purchaseDate, p.id) || { inputQty: 0, unit: 'pack', qty: 0, packCost: Number(p.packCost)||0, totalCost: 0 };
-  var unit = pc.unit || 'pack';
+  var pc = getPurchase(appState.purchaseDate, p.id) || { inputQty:0, unit:'pack', qty:0, packCost:Number(p.packCost)||0, totalCost:0 };
+  var unitSel = pc.unit || 'pack';
   var packQty = Number(p.packQty) || 1;
   var disAttr = !editable ? 'disabled' : '';
-  var thumb = p.img ? '<img src="' + p.img + '">' : (p.emoji || '🍢');
-  var savedTag = pc.qty ? '<span style="font-size:11px;color:var(--green);margin-left:8px;">✓ 已录</span>' : '';
+  var thumb = p.img ? '<img src="' + p.img + '" alt="">' : (p.emoji || '🍢');
+  var prev = getLastRecordBefore(p.id, appState.purchaseDate);
+  var prevText = prev ? ('上次 ' + formatCnDate(prev.date) + ' 是 ' + prev.rem + ' ' + p.unit) : '首次记录';
+  var savedTag = pc.qty ? '<span style="font-size:11px;color:var(--green-text);margin-left:6px;">✓ 已录</span>' : '';
 
-  return '<div class="p-card" style="gap:12px;">' +
+  return '<div class="p-card">' +
     '<div class="p-top">' +
       '<div class="p-thumb">' + thumb + '</div>' +
-      '<div style="flex:1;">' +
-        '<div style="font-weight:700;font-size:16px;">' + esc(p.name) + savedTag + '</div>' +
-        '<div style="font-size:13px;color:var(--muted);margin-top:4px;">每包 ' + packQty + ' ' + esc(p.unit) + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-weight:700;font-size:15px;">' + esc(p.name) + savedTag + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:3px;">每包 ' + packQty + ' ' + esc(p.unit) + ' · 每支售价 RM ' + Number(p.price).toFixed(2) + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-top:3px;">' + prevText + '</div>' +
       '</div>' +
     '</div>' +
-    '<div style="display:flex; background:var(--surface-2); border-radius:8px; padding:3px;">' +
-      '<button class="btn ' + (unit === 'pack' ? 'btn-blue' : '') + '" style="flex:1;padding:8px;border-radius:6px;font-size:13px;" ' + disAttr + ' onclick="setPurchaseUnit(\'' + p.id + '\',\'pack\')">按包录入</button>' +
-      '<button class="btn ' + (unit === 'stick' ? 'btn-blue' : '') + '" style="flex:1;padding:8px;border-radius:6px;font-size:13px;" ' + disAttr + ' onclick="setPurchaseUnit(\'' + p.id + '\',\'stick\')">按支录入</button>' +
+    '<div style="display:flex; gap:8px; margin-bottom:4px;">' +
+      '<button class="btn btn-sm ' + (unitSel === 'pack' ? 'btn-blue' : 'btn-dark') + '" style="flex:1;" ' + disAttr + ' onclick="setPurchaseUnit(\'' + p.id + '\',\'pack\')">按包录入</button>' +
+      '<button class="btn btn-sm ' + (unitSel === 'stick' ? 'btn-blue' : 'btn-dark') + '" style="flex:1;" ' + disAttr + ' onclick="setPurchaseUnit(\'' + p.id + '\',\'stick\')">按支录入</button>' +
     '</div>' +
-    '<div style="display:flex; gap:10px;">' +
-      '<div style="flex:1;">' +
-        '<div style="font-size:12px;color:var(--muted);margin-bottom:4px;">' + (unit === 'pack' ? '进货包数' : '进货支数') + '</div>' +
-        '<input type="number" min="0" class="ws-input" ' + disAttr + ' style="text-align:center;font-size:18px;font-weight:700;" value="' + (pc.inputQty || '') + '" onchange="updatePurchase(\'' + p.id + '\',\'inputQty\',this.value)">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+      '<div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">' + (unitSel === 'pack' ? '进货包数' : '进货支数') + '</div>' +
+        '<input type="number" min="0" ' + disAttr + ' style="text-align:center;font-weight:700;" value="' + (pc.inputQty || '') + '" placeholder="0" onchange="updatePurchase(\'' + p.id + '\',\'inputQty\',this.value)">' +
       '</div>' +
-      '<div style="flex:1;">' +
-        '<div style="font-size:12px;color:var(--muted);margin-bottom:4px;">每包成本 (RM)</div>' +
-        '<input type="number" min="0" step="0.01" class="ws-input" ' + disAttr + ' style="text-align:center;font-size:18px;font-weight:700;" value="' + (pc.packCost || '') + '" onchange="updatePurchase(\'' + p.id + '\',\'packCost\',this.value)">' +
+      '<div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">每包成本 RM</div>' +
+        '<input type="number" min="0" step="0.01" ' + disAttr + ' style="text-align:center;font-weight:700;" value="' + (pc.packCost || '') + '" placeholder="0.00" onchange="updatePurchase(\'' + p.id + '\',\'packCost\',this.value)">' +
       '</div>' +
     '</div>' +
-    '<div class="calc-box" style="justify-content:space-between;">' +
+    '<div class="calc-box">' +
       '<span class="calc-item">换算: ' + pc.qty + ' ' + esc(p.unit) + '</span>' +
-      '<span class="calc-item ok">总成本: RM ' + Number(pc.totalCost).toFixed(2) + '</span>' +
+      '<span class="calc-item green">总成本: RM ' + Number(pc.totalCost).toFixed(2) + '</span>' +
     '</div>' +
   '</div>';
 }
 
-function changePurchaseDate(d) { appState.purchaseDate = d; render(); }
+function changePurchaseDate(d) { appState.purchaseDate = d; appState.purchaseUnit = {}; render(); }
 function setPurchaseUnit(pid, u) {
   if (!appState.records[appState.purchaseDate]) appState.records[appState.purchaseDate] = {};
   if (!appState.records[appState.purchaseDate][pid]) appState.records[appState.purchaseDate][pid] = { rem:'', waste:0, wasteReason:'' };
@@ -522,7 +589,7 @@ function updatePurchase(pid, field, val) {
   if (!appState.records[appState.purchaseDate]) appState.records[appState.purchaseDate] = {};
   if (!appState.records[appState.purchaseDate][pid]) appState.records[appState.purchaseDate][pid] = { rem:'', waste:0, wasteReason:'' };
   var rec = appState.records[appState.purchaseDate][pid];
-  if (!rec.purchase) rec.purchase = { inputQty:0, unit:'pack', qty:0, packCost:0, totalCost:0 };
+  if (!rec.purchase) rec.purchase = { inputQty:0, unit:'pack', qty:0, packCost:Number(p.packCost)||0, totalCost:0 };
 
   if (field === 'inputQty') rec.purchase.inputQty = val === '' ? 0 : Number(val);
   else if (field === 'packCost') rec.purchase.packCost = val === '' ? 0 : Number(val);
@@ -538,104 +605,213 @@ function updatePurchase(pid, field, val) {
   saveStore(); render();
 }
 
-// ================= 统计页面 =================
+/* ================= 统计页 ================= */
 function viewStats() {
   var dates = [];
   for (var i = appState.statsDays - 1; i >= 0; i--) dates.push(getLocalDate(-i));
-  
-  var totPur = 0, totCost = 0, totSold = 0, totSalesAmt = 0, totWaste = 0;
-  dates.forEach(function(d){
+  var activeDays = dates.filter(function(d) { return appState.records[d] && Object.keys(appState.records[d]).length > 0; });
+  var countedProdSet = {};
+  activeDays.forEach(function(d) {
+    Object.keys(appState.records[d]).forEach(function(pid) { countedProdSet[pid] = true; });
+  });
+  var countedCount = Object.keys(countedProdSet).length;
+
+  var totPurchaseQty = 0, totPurchaseCost = 0, totSold = 0, totSalesAmt = 0, totWaste = 0, totWasteAmt = 0;
+  dates.forEach(function(d) {
     var s = calcDayStats(d);
-    totPur += s.purchaseQty; totCost += s.purchaseCost;
+    totPurchaseQty += s.purchaseQty; totPurchaseCost += s.purchaseCost;
     totSold += s.soldCount; totSalesAmt += s.salesAmt;
-    totWaste += s.wasteCount;
+    totWaste += s.wasteCount; totWasteAmt += s.wasteAmt;
   });
 
-  var html = '<div class="pills-row">' +
-    '<button class="pill ' + (appState.statsDays === 7 ? 'active' : '') + '" onclick="setStatsDays(7)">近 7 天</button>' +
-    '<button class="pill ' + (appState.statsDays === 30 ? 'active' : '') + '" onclick="setStatsDays(30)">近 30 天</button>' +
-  '</div>';
+  var dayBtns = '';
+  var dayOpts = [1, 2, 7, 30];
+  var labels = ['今天', '昨天', '7 天', '30 天'];
+  for (var k = 0; k < dayOpts.length; k++) {
+    dayBtns += '<button class="pill ' + (appState.statsDays === dayOpts[k] ? 'active' : '') + '" onclick="setStatsDays(' + dayOpts[k] + ')">' + labels[k] + '</button>';
+  }
 
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
-    '<div class="card" style="padding:16px;"><div style="font-size:13px;color:var(--muted);">进货总量</div><div style="font-size:20px;font-weight:700;margin-top:6px;">' + totPur + ' 支</div></div>' +
-    '<div class="card" style="padding:16px;"><div style="font-size:13px;color:var(--muted);">进货成本</div><div style="font-size:20px;font-weight:700;margin-top:6px;">RM ' + totCost.toFixed(2) + '</div></div>' +
-    '<div class="card" style="padding:16px;"><div style="font-size:13px;color:var(--muted);">推算销售</div><div style="font-size:20px;font-weight:700;margin-top:6px;">' + totSold + ' 支</div></div>' +
-    '<div class="card" style="padding:16px;"><div style="font-size:13px;color:var(--muted);">销售金额</div><div style="font-size:20px;font-weight:700;margin-top:6px;color:var(--green);">RM ' + totSalesAmt.toFixed(2) + '</div></div>' +
-  '</div>';
-  return html;
+  var chartRows = '';
+  appState.products.forEach(function(p) {
+    var pts = [];
+    dates.forEach(function(d) {
+      var r = appState.records[d] && appState.records[d][p.id];
+      if (r && r.rem !== '' && r.rem !== undefined) pts.push(Number(r.rem));
+    });
+    if (!pts.length) return;
+    var latest = pts[pts.length - 1];
+    var minV = Math.min.apply(null, pts), maxV = Math.max.apply(null, pts);
+    var bodyHtml = appState.statsView === 'chart'
+      ? renderSparkline(pts, minV, maxV, dates[0], dates[dates.length - 1])
+      : '<div style="font-size:12px;color:var(--muted);">区间记录：' + pts.join(' → ') + ' ' + esc(p.unit) + '</div>';
+    chartRows += '<div class="p-card" style="padding:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div style="font-weight:700;font-size:14px;">' + esc(p.name) + '</div>' +
+        '<div style="font-weight:800;font-size:16px;">' + latest + ' <span style="font-size:11px;color:var(--muted);">' + esc(p.unit) + '</span></div>' +
+      '</div>' + bodyHtml +
+    '</div>';
+  });
+  if (!chartRows) chartRows = '<div class="info-quote">所选时间段内暂无盘点走势数据</div>';
+
+  function statBox(label, val) {
+    return '<div class="card" style="padding:12px;text-align:center;">' +
+      '<div style="font-size:11px;color:var(--muted);">' + label + '</div>' +
+      '<div style="font-size:18px;font-weight:800;margin-top:4px;">' + val + '</div>' +
+    '</div>';
+  }
+
+  return '<div class="pills-row">' + dayBtns + '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+      statBox('进货总数', totPurchaseQty + ' 支') +
+      statBox('进货成本', 'RM ' + totPurchaseCost.toFixed(2)) +
+      statBox('推算销售', totSold + ' 支') +
+      statBox('销售金额', 'RM ' + totSalesAmt.toFixed(2)) +
+      statBox('损耗总数', totWaste + ' 支') +
+      statBox('损耗金额', 'RM ' + totWasteAmt.toFixed(2)) +
+    '</div>' +
+    '<div class="card-hd" style="margin-top:10px;"><span>剩余数量走势</span><span style="font-size:12px;color:var(--muted);">' + countedCount + ' 个产品</span></div>' +
+    '<button class="btn btn-dark btn-full btn-sm" onclick="toggleStatsView()">' + (appState.statsView === 'chart' ? '切换表格' : '切换走势图') + '</button>' +
+    chartRows;
 }
 
-// ================= 产品页面 =================
+function renderSparkline(pts, minV, maxV, startD, endD) {
+  var w = 110, h = 44;
+  var span = Math.max(1, maxV - minV);
+  var coords = pts.map(function(v, i) {
+    var x = pts.length === 1 ? w / 2 : (i / (pts.length - 1)) * (w - 12) + 6;
+    var y = h - 8 - ((v - minV) / span) * (h - 16);
+    return x + ',' + y;
+  });
+  var lastPt = coords[coords.length - 1].split(',');
+  return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;">' +
+    '<div style="font-size:10px;color:var(--muted);">' + formatCnDate(startD) + '</div>' +
+    '<div style="font-size:10px;color:var(--muted);text-align:center;">最低 ' + minV + ' · 最高 ' + maxV + '</div>' +
+    '<div><svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" style="overflow:visible;">' +
+      '<polyline points="' + coords.join(' ') + '" fill="none" stroke="var(--blue-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<circle cx="' + lastPt[0] + '" cy="' + lastPt[1] + '" r="3" fill="var(--blue-light)"/>' +
+    '</svg></div>' +
+    '<div style="font-size:10px;color:var(--muted);">' + formatCnDate(endD) + '</div>' +
+  '</div>';
+}
+
+/* ================= 产品页 ================= */
 function viewProducts() {
-  var list = appState.products.filter(function(p){ return p.name.toLowerCase().indexOf(appState.search.toLowerCase()) > -1; });
+  var list = appState.products.filter(function(p) {
+    return p.name.toLowerCase().indexOf(appState.search.toLowerCase()) > -1;
+  });
   var rows = '';
-  list.forEach(function(p){
-    var thumb = p.img ? '<img src="' + p.img + '">' : (p.emoji || '🍢');
-    rows += '<div class="p-card" onclick="openProdEditor(\'' + p.id + '\')" style="flex-direction:row;align-items:center;padding:14px;">' +
-      '<div class="p-thumb" style="width:56px;height:56px;">' + thumb + '</div>' +
-      '<div style="flex:1;">' +
-        '<div style="font-weight:700;font-size:16px;">' + esc(p.name) + '</div>' +
-        '<div style="font-size:13px;color:var(--muted);margin-top:4px;">' + esc(p.cat) + '  RM ' + Number(p.price).toFixed(2) + '  提醒值 ' + p.low + '</div>' +
+  list.forEach(function(p) {
+    var rem = getLatestRem(p.id);
+    var thumb = p.img ? '<img src="' + p.img + '" alt="">' : (p.emoji || '🍢');
+    rows += '<div class="p-card" onclick="openProdEditor(\'' + p.id + '\')">' +
+      '<div class="p-top">' +
+        '<div class="p-thumb">' + thumb + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-weight:700;font-size:15px;">' + esc(p.name) + '</div>' +
+          '<div style="font-size:12px;color:var(--muted);margin-top:3px;">' + esc(p.cat) + ' · RM ' + Number(p.price).toFixed(2) + ' · ' + esc(p.spec || '1 stick') + ' · 提醒值 ' + p.low + '</div>' +
+        '</div>' +
+        '<div style="text-align:right;">' +
+          '<div style="font-weight:800;font-size:20px;">' + (rem !== null ? rem : '-') + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);">剩余 ' + esc(p.unit) + '</div>' +
+        '</div>' +
       '</div>' +
     '</div>';
   });
-  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-      '<div style="font-size:16px;font-weight:700;">产品清单 (' + list.length + ')</div>' +
-      '<button class="btn btn-blue" style="padding:8px 14px;" onclick="openProdEditor()">新增产品</button>' +
+  if (!rows) rows = '<div class="info-quote">暂无产品，点右上角「新增产品」或到「设定」一键载入清单</div>';
+  return '<div class="card-hd"><span>产品清单 (' + list.length + ')</span>' +
+      '<button class="btn btn-blue btn-sm" onclick="openProdEditor()">+ 新增产品</button>' +
     '</div>' + rows;
 }
 
-// ================= 设定页面 =================
+function getLatestRem(prodId) {
+  var allDates = Object.keys(appState.records).sort().reverse();
+  for (var i = 0; i < allDates.length; i++) {
+    var d = allDates[i];
+    var r = appState.records[d] && appState.records[d][prodId];
+    if (r && r.rem !== '' && r.rem !== undefined && r.rem !== null) {
+      return Number(r.rem);
+    }
+  }
+  return null;
+}
+
+/* ================= 设定页 ================= */
 function viewSettings() {
   var recDates = Object.keys(appState.records).sort().reverse();
-  var hist = '';
-  recDates.slice(0, 5).forEach(function(d){
+  var dataSizeKb = Math.max(1, Math.round(JSON.stringify(localStorage).length / 1024));
+  var histHtml = '';
+  recDates.forEach(function(d) {
     var s = calcDayStats(d);
-    hist += '<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">' +
-      '<div><div style="font-weight:600;">' + formatCnDate(d) + '</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">' + s.filled + ' 个产品 · 卖出 ' + s.soldCount + '</div></div>' +
-      '<button class="btn btn-dark" style="padding:6px 12px;font-size:12px;" onclick="openHistoryDate(\'' + d + '\')">打开</button>' +
+    histHtml += '<div class="p-card" style="padding:12px;flex-direction:row;justify-content:space-between;align-items:center;">' +
+      '<div>' +
+        '<div style="font-weight:700;font-size:14px;">' + formatCnDateWeek(d) + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:3px;">进货 ' + s.purchaseQty + ' · 卖出 ' + s.soldCount + ' · 损耗 ' + s.wasteCount + '</div>' +
+      '</div>' +
+      '<button class="btn btn-dark btn-sm" onclick="openHistoryDate(\'' + d + '\')">打开</button>' +
     '</div>';
   });
+  if (!histHtml) histHtml = '<div class="info-quote">暂无历史盘点纪录</div>';
 
   return '<div class="card">' +
-      '<div style="font-weight:700;font-size:16px;margin-bottom:16px;">店铺设定</div>' +
-      '<div style="margin-bottom:12px;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">店名</div><input id="setShop" value="' + esc(appState.settings.shopName) + '"></div>' +
-      '<div style="margin-bottom:12px;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">预设低库存警告值</div><input id="setLow" type="number" value="' + appState.settings.defaultLow + '"></div>' +
-      '<div style="margin-bottom:16px;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">发送至 WhatsApp 号码</div><input id="setWa" value="' + esc(appState.settings.whatsapp) + '" placeholder="例：60123456789"></div>' +
-      '<button class="btn btn-blue btn-full" onclick="saveSettingsNow()">保存设定</button>' +
-    '</div>' +
-    '<div class="card">' +
-      '<div style="font-weight:700;font-size:16px;margin-bottom:12px;">产品清单</div>' +
-      '<div style="font-size:13px;color:var(--muted);margin-bottom:12px;">载入完整产品清单（141项）。已有的不会重复添加。</div>' +
-      '<button class="btn btn-dark btn-full" onclick="loadPresetList()">载入全部产品</button>' +
-    '</div>' +
-    '<div class="card">' +
-      '<div style="font-weight:700;font-size:16px;margin-bottom:12px;">资料</div>' +
-      '<div style="display:flex;gap:10px;margin-bottom:16px;">' +
-        '<button class="btn btn-blue" style="flex:1;" onclick="exportExcelCsv()">汇出 Excel (.csv)</button>' +
-        '<button class="btn btn-dark" style="flex:1;" onclick="exportJsonBackup()">汇出备份 (.json)</button>' +
+      '<div class="card-hd">店铺</div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">店名</div>' +
+          '<input id="setShop" value="' + esc(appState.settings.shopName) + '"></div>' +
+        '<div><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">预设低库存警告值</div>' +
+          '<input id="setLow" type="number" value="' + appState.settings.defaultLow + '">' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;">新增产品时用这个值。</div></div>' +
+        '<div><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">发送到这个 WhatsApp 号码</div>' +
+          '<input id="setWa" value="' + esc(appState.settings.whatsapp) + '" placeholder="例：60123456789">' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;">国际格式，不用 + 号，开头不用 0。</div></div>' +
+        '<button class="btn btn-blue btn-full" onclick="saveSettingsNow()">保存设定</button>' +
       '</div>' +
-      '<label class="btn btn-dark btn-full" style="cursor:pointer;margin-bottom:10px;">还原备份<input type="file" accept=".json" style="display:none;" onchange="importJsonBackup(event)"></label>' +
-      '<button class="btn btn-dark btn-full" style="color:var(--red);" onclick="clearEverything()">清空全部资料</button>' +
     '</div>' +
     '<div class="card">' +
-      '<div style="font-weight:700;font-size:16px;margin-bottom:12px;">盘点纪录</div>' + hist +
+      '<div class="card-hd">产品清单（自动 / 批量添加）</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">载入预设产品清单，或一次性粘贴多行产品自动生成。</div>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<button class="btn btn-blue btn-full" onclick="loadPresetList()">载入全部预设产品</button>' +
+        '<button class="btn btn-dark btn-full" onclick="openBatchAddModal()">⚡ 批量粘贴新增</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-hd">资料</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">全部只存在这台装置里，请定期备份。约 ' + dataSizeKb + ' KB</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' +
+        '<button class="btn btn-dark btn-full" onclick="exportExcelCsv()">汇出 Excel 表格 (.csv)</button>' +
+        '<button class="btn btn-dark btn-full" onclick="exportJsonBackup()">汇出备份 (.json)</button>' +
+        '<label class="btn btn-dark btn-full" style="cursor:pointer;text-align:center;">还原备份<input type="file" accept=".json" style="display:none;" onchange="importJsonBackup(event)"></label>' +
+        '<button class="btn btn-dark btn-full" onclick="fillDemoRecords()">填入示范资料</button>' +
+        '<button class="btn btn-dark btn-full" style="color:var(--red-text);" onclick="clearEverything()">清空全部资料</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card-hd">盘点纪录</div>' + histHtml +
+    '<div class="card">' +
+      '<div class="card-hd">说明</div>' +
+      '<div style="font-size:13px;line-height:1.8;color:var(--muted);">' +
+        '每天打烊时，每个产品填一个 <b style="color:var(--text);">剩余数量</b>，有丢掉的就填损耗。' +
+        '<div style="margin-top:8px;"><b style="color:var(--text);">进货</b>页录入当天到货，支持按包或按支，自动换算支数并保存当次成本。</div>' +
+        '<div style="margin-top:10px;">销售推算 = 上次剩余 + 今日进货 - 损耗 - 今日剩余。</div>' +
+        '<div style="margin-top:10px;"><b style="color:var(--text);">和昨天一样</b> 会把还没填的产品自动补上它上次的数量。已经填过的不会被覆盖。</div>' +
+        '<div style="margin-top:10px;">只能改今天、昨天、前天，更早的日期打开是只读的。</div>' +
+      '</div>' +
     '</div>';
 }
 
-// ================= 交互函数 =================
 function switchTab(t) { appState.tab = t; appState.search = ''; render(); window.scrollTo(0, 0); }
 function changeDate(d) { appState.date = d; render(); }
 function setSearch(q) { appState.search = q; render(); }
 function selectCat(c) { appState.selectedCat = c; render(); }
 function toggleCat(c) { appState.collapsedCats[c] = !appState.collapsedCats[c]; render(); }
+function setStatsDays(d) { appState.statsDays = d; render(); }
+function toggleStatsView() { appState.statsView = appState.statsView === 'chart' ? 'table' : 'chart'; render(); }
+function openHistoryDate(d) { appState.date = d; appState.tab = 'count'; render(); }
 function toggleCollapseAll() {
   var cats = appState.settings.categories || DEFAULT_CATEGORIES;
-  var anyOpen = cats.some(function(c){ return !appState.collapsedCats[c]; });
-  cats.forEach(function(c){ appState.collapsedCats[c] = anyOpen; });
+  var anyOpen = cats.some(function(c) { return !appState.collapsedCats[c]; });
+  cats.forEach(function(c) { appState.collapsedCats[c] = anyOpen; });
   render();
 }
-function openHistoryDate(d) { appState.date = d; appState.tab = 'count'; render(); }
 function updateRec(pid, field, val) {
   if (!isDateEditable(appState.date)) return toast('超过3天的历史记录不可修改');
   if (!appState.records[appState.date]) appState.records[appState.date] = {};
@@ -643,88 +819,103 @@ function updateRec(pid, field, val) {
   if (field === 'rem') appState.records[appState.date][pid].rem = (val === '' ? '' : Number(val));
   else if (field === 'waste') appState.records[appState.date][pid].waste = (val === '' ? 0 : Number(val));
   else appState.records[appState.date][pid].wasteReason = val;
-  saveStore(); render();
+  saveStore();
+  render();
 }
 function quickSetRem(pid, num) { updateRec(pid, 'rem', num); }
 function fillSameAsYesterday() {
   if (!isDateEditable(appState.date)) return toast('只读日期无法修改');
   if (!appState.records[appState.date]) appState.records[appState.date] = {};
   var cnt = 0;
-  appState.products.forEach(function(p){
+  appState.products.forEach(function(p) {
     var cur = appState.records[appState.date][p.id];
-    if (!cur || cur.rem === '' || cur.rem === undefined) {
+    if (!cur || cur.rem === '' || cur.rem === undefined || cur.rem === null) {
       var prev = getLastRecordBefore(p.id, appState.date);
       if (prev) {
-        appState.records[appState.date][p.id] = { rem: prev.rem, waste: 0, wasteReason: '' };
+        appState.records[appState.date][p.id] = {
+          rem: prev.rem,
+          waste: cur ? cur.waste : 0,
+          wasteReason: cur ? cur.wasteReason : '',
+          purchase: cur ? cur.purchase : undefined
+        };
         cnt++;
       }
     }
   });
-  saveStore(); render(); toast('已自动补齐 ' + cnt + ' 个未动产品');
+  saveStore();
+  render();
+  toast('已自动补齐 ' + cnt + ' 个未动产品');
 }
 function saveSettingsNow() {
   appState.settings.shopName = document.getElementById('setShop').value.trim() || '大成';
   appState.settings.defaultLow = Number(document.getElementById('setLow').value) || 5;
   appState.settings.whatsapp = document.getElementById('setWa').value.replace(/\D/g, '');
-  saveStore(); render(); toast('设定已保存');
+  saveStore();
+  render();
+  toast('设定已保存');
 }
 
-// ================= 产品编辑弹窗 =================
+/* ================= 产品编辑器 ================= */
 var editingProdImg = '';
 var editingProdCat = '';
 function openProdEditor(pid) {
-  var p = pid ? getProd(pid) : { id:'', name:'', price:'', cat:(appState.settings.categories[0]), spec:'1 stick', unit:'支', low:appState.settings.defaultLow, img:'', packQty:1, packCost:0 };
+  var p = null;
+  if (pid) p = getProd(pid);
+  if (!p) p = { id:'', name:'', price:'', cat:(appState.settings.categories[0] || '蔬菜和菇'), spec:'1 stick', unit:'支', low:appState.settings.defaultLow, img:'', packQty:1, packCost:0 };
   editingProdImg = p.img || '';
   editingProdCat = p.cat;
-  
-  var chips = '';
-  (appState.settings.categories || DEFAULT_CATEGORIES).forEach(function(c){
-    chips += '<div class="chip ' + (c === editingProdCat ? 'selected' : '') + '" onclick="pickModalCat(this,\'' + esc(c) + '\')">' + esc(c) + '</div>';
+  var cats = appState.settings.categories || DEFAULT_CATEGORIES;
+  var chipsHtml = '';
+  cats.forEach(function(c) {
+    chipsHtml += '<div class="chip ' + (c === editingProdCat ? 'selected' : '') + '" onclick="pickModalCat(this,\'' + esc(c) + '\')">' + esc(c) + '</div>';
   });
-  chips += '<div class="chip" onclick="addNewCategory(' + (pid ? '\'' + pid + '\'' : 'null') + ')">+ 新分类</div>';
-  
-  var imgHtml = editingProdImg ? '<img src="' + editingProdImg + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">' : (p.emoji || '🍢');
-  var delBtn = pid ? '<button class="btn btn-dark" style="color:var(--red);flex:1;" onclick="deleteProd(\'' + pid + '\')">删除</button>' : '';
-
+  chipsHtml += '<div class="chip" onclick="addNewCategory(' + (pid ? '\'' + pid + '\'' : 'null') + ')">+ 新分类</div>';
+  var previewImgHtml = editingProdImg ? '<img src="' + editingProdImg + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">' : '🍢';
+  var delBtnHtml = pid ? '<button class="btn btn-dark" style="color:var(--red-text);" onclick="deleteProd(\'' + pid + '\')">删除</button>' : '';
   document.getElementById('modalLayer').innerHTML =
     '<div class="modal-bg" onclick="if(event.target===this)closeModal()">' +
       '<div class="modal-card">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-          '<div style="font-size:18px;font-weight:700;">' + (pid ? '编辑产品' : '新增产品') + '</div>' +
-          '<button class="btn btn-dark" style="border-radius:50%;width:32px;height:32px;padding:0;" onclick="closeModal()">✕</button>' +
+          '<div style="font-weight:800;font-size:17px;">' + (pid ? '编辑产品' : '新增产品') + '</div>' +
+          '<button class="btn btn-dark btn-sm" onclick="closeModal()">✕</button>' +
         '</div>' +
-        '<div>' +
-          '<div style="font-size:13px;color:var(--muted);margin-bottom:8px;">照片</div>' +
-          '<div style="display:flex;gap:12px;align-items:center;">' +
-            '<div class="p-thumb" id="imgPreviewBox" style="width:80px;height:80px;">' + imgHtml + '</div>' +
-            '<div style="flex:1;">' +
-              '<label class="btn btn-dark btn-full" style="cursor:pointer;margin-bottom:6px;">拍照 / 选图<input type="file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)"></label>' +
-              '<div style="font-size:12px;color:var(--muted);">内建照片。可以拍一张自己的取代它。</div>' +
-            '</div>' +
+        '<div style="display:flex;gap:12px;align-items:center;">' +
+          '<div class="p-thumb" id="imgPreviewBox" style="width:72px;height:72px;">' + previewImgHtml + '</div>' +
+          '<div style="flex:1;">' +
+            '<label class="btn btn-dark btn-sm" style="width:100%;cursor:pointer;">📷 拍照 / 选图<input type="file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)"></label>' +
+            '<div style="font-size:11px;color:var(--muted);margin-top:6px;">自动压缩保存。</div>' +
           '</div>' +
         '</div>' +
-        '<div><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">产品名称</div><input id="edName" value="' + esc(p.name) + '"></div>' +
-        '<div style="display:flex;gap:12px;">' +
-          '<div style="flex:1;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">售价 RM</div><input id="edPrice" type="number" step="0.01" value="' + (p.price || '') + '"></div>' +
-          '<div style="flex:2;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">分类</div><div class="cat-chips" id="catChipsBox" style="max-height:80px;overflow-y:auto;">' + chips + '</div></div>' +
+        '<div><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">产品名称</div>' +
+          '<input id="edName" value="' + esc(p.name) + '"></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<div style="flex:1;"><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">售价 RM / 支</div>' +
+            '<input id="edPrice" type="number" step="0.01" value="' + (p.price || '') + '"></div>' +
+          '<div style="flex:1;"><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">每包成本 RM</div>' +
+            '<input id="edPackCost" type="number" step="0.01" value="' + (p.packCost || 0) + '"></div>' +
         '</div>' +
-        '<div style="display:flex;gap:12px;">' +
-          '<div style="flex:1;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">包装规格</div><input id="edSpec" value="' + esc(p.spec) + '"></div>' +
-          '<div style="width:80px;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">单位</div><input id="edUnit" value="' + esc(p.unit) + '"></div>' +
+        '<div><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">分类</div>' +
+          '<div class="cat-chips" id="catChipsBox">' + chipsHtml + '</div></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<div style="flex:1;"><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">包装规格</div>' +
+            '<input id="edSpec" value="' + esc(p.spec || '1 stick') + '"></div>' +
+          '<div style="width:72px;"><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">单位</div>' +
+            '<input id="edUnit" value="' + esc(p.unit || '支') + '"></div>' +
         '</div>' +
-        '<div style="display:flex;gap:12px;">' +
-          '<div style="flex:1;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">每包数量</div><input id="edPackQty" type="number" min="1" value="' + (p.packQty || 1) + '"></div>' +
-          '<div style="flex:1;"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">每包成本 RM</div><input id="edPackCost" type="number" step="0.01" value="' + (p.packCost || 0) + '"></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<div style="flex:1;"><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">每包数量</div>' +
+            '<input id="edPackQty" type="number" min="1" value="' + (p.packQty || 1) + '"></div>' +
+          '<div style="flex:1;"><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">低库存提醒值</div>' +
+            '<input id="edLow" type="number" value="' + (p.low || 5) + '"></div>' +
         '</div>' +
-        '<div><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">低库存提醒值</div><input id="edLow" type="number" value="' + (p.low || 5) + '"></div>' +
-        '<div style="display:flex;gap:10px;margin-top:10px;">' + delBtn +
-          '<button class="btn btn-blue" style="flex:2;" onclick="saveProdEditor(' + (pid ? '\'' + pid + '\'' : 'null') + ')">保存产品</button></div>' +
+        '<div style="display:flex;gap:8px;">' + delBtnHtml +
+          '<button class="btn btn-blue btn-full" onclick="saveProdEditor(' + (pid ? '\'' + pid + '\'' : 'null') + ')">保存产品</button></div>' +
       '</div>' +
     '</div>';
 }
 function pickModalCat(btn, cat) {
   editingProdCat = cat;
-  document.querySelectorAll('#catChipsBox .chip').forEach(function(el){ el.classList.remove('selected'); });
+  document.querySelectorAll('#catChipsBox .chip').forEach(function(el) { el.classList.remove('selected'); });
   btn.classList.add('selected');
 }
 function addNewCategory(pid) {
@@ -738,9 +929,9 @@ function addNewCategory(pid) {
 function handlePhotoUpload(e) {
   var file = e.target.files[0]; if (!file) return;
   var reader = new FileReader();
-  reader.onload = function(ev){
+  reader.onload = function(ev) {
     var img = new Image();
-    img.onload = function(){
+    img.onload = function() {
       var canvas = document.createElement('canvas');
       var maxW = 180, scale = Math.min(1, maxW / img.width);
       canvas.width = img.width * scale; canvas.height = img.height * scale;
@@ -755,127 +946,200 @@ function handlePhotoUpload(e) {
 function saveProdEditor(pid) {
   var name = document.getElementById('edName').value.trim();
   var price = parseFloat(document.getElementById('edPrice').value) || 0;
+  var packCost = parseFloat(document.getElementById('edPackCost').value) || 0;
   var spec = document.getElementById('edSpec').value.trim() || '1 stick';
   var unit = document.getElementById('edUnit').value.trim() || '支';
   var packQty = parseInt(document.getElementById('edPackQty').value) || 1;
-  var packCost = parseFloat(document.getElementById('edPackCost').value) || 0;
   var low = parseInt(document.getElementById('edLow').value) || 5;
   if (!name) return toast('请输入产品名称');
-  
   if (pid) {
-    var p = getProd(pid);
-    p.name = name; p.price = price; p.spec = spec; p.unit = unit; p.packQty = packQty; p.packCost = packCost; p.low = low; p.cat = editingProdCat; p.img = editingProdImg;
+    for (var i = 0; i < appState.products.length; i++) {
+      if (appState.products[i].id === pid) {
+        appState.products[i].name = name;
+        appState.products[i].price = price;
+        appState.products[i].packCost = packCost;
+        appState.products[i].cat = editingProdCat;
+        appState.products[i].spec = spec;
+        appState.products[i].unit = unit;
+        appState.products[i].packQty = packQty;
+        appState.products[i].low = low;
+        appState.products[i].img = editingProdImg;
+        break;
+      }
+    }
   } else {
-    appState.products.push({ id:'p_' + Date.now(), name:name, price:price, spec:spec, unit:unit, packQty:packQty, packCost:packCost, low:low, cat:editingProdCat, img:editingProdImg, emoji:'🍢' });
+    appState.products.push({
+      id:'p_' + Date.now(), name:name, price:price, packCost:packCost, cat:editingProdCat,
+      spec:spec, unit:unit, packQty:packQty, low:low, img:editingProdImg, emoji:'🍢'
+    });
   }
-  saveStore(); closeModal(); render(); toast('已保存');
+  saveStore(); closeModal(); render(); toast('产品已保存');
 }
 function deleteProd(pid) {
   if (!confirm('确定删除此产品？')) return;
-  appState.products = appState.products.filter(function(x){ return x.id !== pid; });
+  appState.products = appState.products.filter(function(x) { return x.id !== pid; });
   saveStore(); closeModal(); render(); toast('已删除');
 }
-function closeModal() { document.getElementById('modalLayer').innerHTML = ''; }
 
-// ================= 报告与备份 =================
+/* ================= 弹窗与工具 ================= */
+function openBatchAddModal() {
+  document.getElementById('modalLayer').innerHTML =
+    '<div class="modal-bg" onclick="if(event.target===this)closeModal()">' +
+      '<div class="modal-card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div style="font-weight:800;font-size:17px;">⚡ 批量粘贴自动添加</div>' +
+          '<button class="btn btn-dark btn-sm" onclick="closeModal()">✕</button>' +
+        '</div>' +
+        '<div class="info-quote">每行一个产品，格式：产品名, 单价, 分类（不写单价和分类会自动用默认值）</div>' +
+        '<textarea id="batchInput" rows="8" placeholder="鱼饼 FISH CAKE, 0.60, 丸类&#10;鸡肉串 CHICKEN SKEWER, 1.20, 鸡肉类"></textarea>' +
+        '<button class="btn btn-blue btn-full" onclick="processBatchAdd()">一键全部加入产品库</button>' +
+      '</div>' +
+    '</div>';
+}
+function processBatchAdd() {
+  var lines = document.getElementById('batchInput').value.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+  if (!lines.length) return toast('请先粘贴产品内容');
+  var added = 0;
+  lines.forEach(function(line, idx) {
+    var parts = line.split(/[,，\t]/).map(function(s) { return s.trim(); });
+    var name = parts[0]; if (!name) return;
+    if (appState.products.some(function(p) { return p.name === name; })) return;
+    var price = parseFloat(parts[1]) || 0.50;
+    var cat = parts[2] || appState.settings.categories[0] || '其他类';
+    if (appState.settings.categories.indexOf(cat) === -1) appState.settings.categories.push(cat);
+    appState.products.push({
+      id:'p_' + Date.now() + '_' + idx, name:name, price:price, packCost:0, cat:cat,
+      spec:'1 stick', unit:'支', packQty:1, low:appState.settings.defaultLow, emoji:'🍢'
+    });
+    added++;
+  });
+  saveStore(); closeModal(); render(); toast('成功批量添加 ' + added + ' 个产品！');
+}
 function openWaModal() {
   var s = calcDayStats(appState.date);
   var lowList = [], wasteList = [], remLines = [], purLines = [];
-  appState.products.forEach(function(p){
+  appState.products.forEach(function(p) {
     var r = appState.records[appState.date] && appState.records[appState.date][p.id];
     var pc = getPurchase(appState.date, p.id);
-    if (pc && pc.qty) purLines.push('• ' + p.name + ': +' + pc.qty + p.unit + ' (RM ' + pc.totalCost.toFixed(2) + ')');
+    if (pc && pc.qty) purLines.push('• ' + p.name + ': ' + pc.qty + p.unit + ' (RM ' + Number(pc.totalCost).toFixed(2) + ')');
     if (r && r.rem !== '' && r.rem !== undefined) {
       remLines.push('• ' + p.name + ': ' + r.rem + p.unit);
       if (Number(r.rem) <= p.low) lowList.push('• ' + p.name + ': 剩 ' + r.rem + p.unit + ' (警戒≤' + p.low + ')');
     }
     if (r && Number(r.waste) > 0) {
-      wasteList.push('• ' + p.name + ': ' + r.waste + p.unit + ' (RM ' + (r.waste * p.price).toFixed(2) + ') ' + (r.wasteReason ? '[' + r.wasteReason + ']' : ''));
+      wasteList.push('• ' + p.name + ': ' + r.waste + p.unit + ' (RM ' + (Number(r.waste) * p.price).toFixed(2) + ') ' + (r.wasteReason ? '[' + r.wasteReason + ']' : ''));
     }
   });
   var text = '📋【' + appState.settings.shopName + '】盘点报告\n' +
-    '📅 日期：' + appState.date + '\n' +
+    '📅 日期：' + appState.date + ' (' + formatCnDateWeek(appState.date) + ')\n' +
     '✅ 进度：已盘点 ' + s.filled + ' / ' + s.total + ' 项\n' +
-    '━━━━━━━━━━━━━━━\n' +
-    '📦 进货：' + s.purchaseQty + ' 支 (成本 RM ' + s.purchaseCost.toFixed(2) + ')\n' + (purLines.length ? purLines.join('\n') + '\n' : '') +
+    '━━━━━━━━━━━━━━━━━━\n' +
+    '📦 今日进货：' + s.purchaseQty + ' 支 (RM ' + s.purchaseCost.toFixed(2) + ')\n' + (purLines.length ? purLines.join('\n') + '\n' : '') +
     '📉 推算销售：' + s.soldCount + ' 支 (约 RM ' + s.salesAmt.toFixed(2) + ')\n' +
-    '🗑️ 损耗：' + s.wasteCount + ' 支 (RM ' + s.wasteAmt.toFixed(2) + ')\n' +
-    '━━━━━━━━━━━━━━━\n' +
+    '🗑️ 今日损耗 WS：' + s.wasteCount + ' 支 (RM ' + s.wasteAmt.toFixed(2) + ')\n' +
+    '━━━━━━━━━━━━━━━━━━\n' +
     '🚨 低库存提醒 (' + lowList.length + ')：\n' + (lowList.length ? lowList.join('\n') : '无') + '\n\n' +
     '⚠️ 损耗明细：\n' + (wasteList.length ? wasteList.join('\n') : '无') + '\n\n' +
-    '📦 已盘点剩余：\n' + (remLines.length ? remLines.join('\n') : '暂未填写');
+    '📦 已盘点剩余明细：\n' + (remLines.length ? remLines.join('\n') : '暂未填写');
   document.getElementById('modalLayer').innerHTML =
     '<div class="modal-bg" onclick="if(event.target===this)closeModal()">' +
       '<div class="modal-card">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-          '<div style="font-size:18px;font-weight:700;">WhatsApp 报告</div>' +
-          '<button class="btn btn-dark" style="border-radius:50%;width:32px;height:32px;padding:0;" onclick="closeModal()">✕</button>' +
+          '<div style="font-weight:800;font-size:17px;">WhatsApp 盘点报告预览</div>' +
+          '<button class="btn btn-dark btn-sm" onclick="closeModal()">✕</button>' +
         '</div>' +
-        '<textarea id="waFinalText" rows="14" style="font-family:monospace;font-size:13px;line-height:1.5;">' + esc(text) + '</textarea>' +
-        '<div style="display:flex;gap:10px;">' +
-          '<button class="btn btn-dark" style="flex:1;" onclick="copyReportText()">复制文字</button>' +
-          '<button class="btn btn-blue" style="flex:2;" onclick="launchWhatsApp()">发送至 WhatsApp</button>' +
+        '<textarea id="waFinalText" rows="14" style="font-family:monospace;font-size:12px;">' + esc(text) + '</textarea>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="btn btn-dark btn-full" onclick="copyReportText()">复制文字</button>' +
+          '<button class="btn btn-blue btn-full" onclick="launchWhatsApp()">打开 WhatsApp</button>' +
         '</div>' +
       '</div>' +
     '</div>';
 }
 function copyReportText() {
   var el = document.getElementById('waFinalText');
-  el.select(); navigator.clipboard.writeText(el.value); toast('已复制到剪贴板');
+  el.select(); navigator.clipboard.writeText(el.value); toast('报告已复制到剪贴板');
 }
 function launchWhatsApp() {
   var msg = encodeURIComponent(document.getElementById('waFinalText').value);
   var phone = appState.settings.whatsapp;
   window.open(phone ? ('https://wa.me/' + phone + '?text=' + msg) : ('https://wa.me/?text=' + msg), '_blank');
 }
+function closeModal() { document.getElementById('modalLayer').innerHTML = ''; }
+
 function loadPresetList() {
   var added = 0;
-  PRESET_PRODUCTS.forEach(function(item){
-    if (!appState.products.some(function(p){ return p.name === item.name; })) {
+  PRESET_PRODUCTS.forEach(function(item) {
+    if (!appState.products.some(function(p) { return p.name === item.name; })) {
       appState.products.push(item); added++;
     }
   });
   saveStore(); render(); toast(added ? ('已载入 ' + added + ' 项产品') : '已存在');
 }
+function fillDemoRecords() {
+  if (!appState.products.length) loadPresetList();
+  var yest = getLocalDate(-1), today = getLocalDate(0);
+  if (!appState.records[yest]) appState.records[yest] = {};
+  if (!appState.records[today]) appState.records[today] = {};
+  appState.products.forEach(function(p, i) {
+    var base = 15 + (i % 4) * 10;
+    appState.records[yest][p.id] = { rem: base, waste: 0, wasteReason: '' };
+    appState.records[today][p.id] = {
+      rem: Math.max(0, base - (i % 7)),
+      waste: (i % 5 === 0 ? 1 : 0),
+      wasteReason: (i % 5 === 0 ? '掉落' : ''),
+      purchase: { inputQty:1, unit:'pack', qty:(p.packQty || 1), packCost:(p.packCost || 0), totalCost:(p.packCost || 0) }
+    };
+  });
+  saveStore(); render(); toast('已填入示范资料');
+}
 function exportExcelCsv() {
-  if (!appState.products.length) return toast('暂无产品');
-  var header = ['日期,分类,产品名称,售价,进货包数,进货支数,进货成本,上次剩余,今日剩余,损耗个数,推算销售'];
-  var lines = appState.products.map(function(p){
+  if (!appState.products.length) return toast('暂无产品资料');
+  var header = ['日期,分类,产品名称,规格,售价(RM),每包数量,每包成本(RM),进货包数,进货支数,进货成本(RM),上次剩余,今日剩余,损耗个数,损耗金额(RM),损耗原因,推算销售'];
+  var lines = appState.products.map(function(p) {
     var r = (appState.records[appState.date] && appState.records[appState.date][p.id]) || {};
-    var pc = getPurchase(appState.date, p.id) || { inputQty:'', qty:'', totalCost:'' };
+    var pc = getPurchase(appState.date, p.id) || { inputQty:'', qty:'', packCost:'', totalCost:'' };
     var prev = getLastRecordBefore(p.id, appState.date);
     var prevRem = prev ? prev.rem : '';
     var rem = (r.rem !== '' && r.rem !== undefined) ? r.rem : '';
     var waste = r.waste || 0;
+    var wasteAmt = (waste * p.price).toFixed(2);
     var sold = (prev && rem !== '') ? (prev.rem + (pc.qty || 0) - waste - Number(rem)) : '';
-    return appState.date + ',"' + p.cat + '","' + p.name + '",' + p.price + ',' + (pc.inputQty||'') + ',' + (pc.qty||'') + ',' + (pc.totalCost||'') + ',' + prevRem + ',' + rem + ',' + waste + ',' + sold;
+    return appState.date + ',"' + p.cat + '","' + p.name + '","' + p.spec + '",' + p.price + ',' + (p.packQty||1) + ',' + (p.packCost||0) + ',' + (pc.inputQty||'') + ',' + (pc.qty||'') + ',' + (pc.totalCost||'') + ',' + prevRem + ',' + rem + ',' + waste + ',' + wasteAmt + ',"' + (r.wasteReason || '') + '",' + sold;
   });
   var blob = new Blob(['\uFEFF' + header.concat(lines).join('\n')], { type:'text/csv;charset=utf-8;' });
-  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = appState.settings.shopName + '报表' + appState.date + '.csv'; a.click();
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = appState.settings.shopName + '报表' + appState.date + '.csv';
+  a.click();
   toast('报表已导出');
 }
 function exportJsonBackup() {
   var blob = new Blob([JSON.stringify({ products:appState.products, records:appState.records, settings:appState.settings }, null, 2)], { type:'application/json' });
-  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '大成备份_' + getLocalDate(0) + '.json'; a.click();
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '大成loklok备份_' + getLocalDate(0) + '.json';
+  a.click();
 }
 function importJsonBackup(e) {
   var f = e.target.files[0]; if (!f) return;
   var reader = new FileReader();
-  reader.onload = function(ev){
+  reader.onload = function(ev) {
     try {
       var d = JSON.parse(ev.target.result);
       if (d.products) appState.products = d.products;
       if (d.records) appState.records = d.records;
       if (d.settings) appState.settings = d.settings;
+      if (!appState.settings.categories) appState.settings.categories = DEFAULT_CATEGORIES.slice();
       saveStore(); render(); toast('备份还原成功');
-    } catch (err) { toast('文件格式错误'); }
+    } catch (err) { toast('备份文件格式错误'); }
   };
   reader.readAsText(f);
 }
 function clearEverything() {
   if (!confirm('⚠️ 确定要清空全部资料吗？')) return;
   appState.products = []; appState.records = [];
-  saveStore(); render(); toast('已清空');
+  saveStore(); render(); toast('已清空全部资料');
 }
 
 render();
