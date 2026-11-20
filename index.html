@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>大成库存管理系统</title>
+<script src="https://jsdelivr.net"></script>
+<style>
+  :root {
+    --bg: #0f1115;
+    --surface: #181b21;
+    --surface-2: #22262f;
+    --border: #2c313d;
+    --text: #f3f4f6;
+    --muted: #9ca3af;
+    --blue: #2563eb;
+    --blue-light: #3b82f6;
+    --red-bg: rgba(239, 68, 68, 0.16);
+    --red-text: #f87171;
+    --green-text: #34d399;
+  }
+  body.light-mode {
+    --bg: #f3f4f6;
+    --surface: #ffffff;
+    --surface-2: #e5e7eb;
+    --border: #d1d5db;
+    --text: #111827;
+    --muted: #6b7280;
+    --red-bg: #fee2e2;
+    --red-text: #dc2626;
+    --green-text: #059669;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    padding-top: calc(64px + env(safe-area-inset-top));
+    padding-bottom: calc(132px + env(safe-area-inset-bottom));
+    min-height: 100vh; transition: background 0.2s, color 0.2s;
+  }
+  /* Header */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    height: calc(64px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 16px 0;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .shop-title { font-size: 19px; font-weight: 800; }
+  .shop-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .theme-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+
+  /* Main */
+  main { max-width: 600px; margin: 0 auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* Bottom Floating Action Bar (Only on Count Tab) */
+  #floatingBar {
+    position: fixed; left: 0; right: 0; bottom: calc(62px + env(safe-area-inset-bottom)); z-index: 35;
+    background: var(--bg); border-top: 1px solid var(--border); padding: 8px 14px;
+  }
+  .float-inner { max-width: 600px; margin: 0 auto; display: flex; gap: 8px; align-items: center; }
+
+  /* Bottom Nav */
+  nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+    height: calc(62px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .nav-item {
+    background: none; border: none; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+  }
+  .nav-item svg { width: 21px; height: 21px; }
+  .nav-item.active { color: var(--blue-light); }
+
+  /* Cards & Controls */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .card-hd { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  input, select, textarea {
+    width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none;
+  }
+  input:focus, textarea:focus { border-color: var(--blue-light); }
+  .btn {
+    border: none; border-radius: 10px; padding: 11px 14px; font-size: 14px; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-dark { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+  .btn-full { width: 100%; }
+
+  /* Category Pills */
+  .pills-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .pills-row::-webkit-scrollbar { display: none; }
+  .pill {
+    white-space: nowrap; padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    background: var(--surface-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
+  }
+  .pill.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* Category Accordion */
+  .cat-header {
+    background: var(--surface-2); padding: 11px 14px; border-radius: 12px;
+    display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+
+  /* Product Count Card */
+  .p-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .p-top { display: flex; gap: 12px; align-items: center; }
+  .p-thumb {
+    width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+    background: var(--surface-2); border: 1px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted);
+  }
+  .low-tag { background: var(--red-bg); color: var(--red-text); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; margin-left: 6px; }
+  .rem-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+  .rem-input {
+    width: 105px; height: 44px; text-align: center; font-size: 18px; font-weight: 800;
+    border: 2px solid var(--blue); background: var(--bg); border-radius: 10px;
+  }
+  .quick-btns { display: flex; gap: 8px; }
+  .q-btn {
+    padding: 6px 14px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .q-btn:active { background: var(--blue); color: #fff; }
+  .ws-box { border-top: 1px solid var(--border); padding-top: 10px; }
+  .ws-grid { display: grid; grid-template-columns: 95px 1fr; gap: 8px; margin-top: 6px; }
+
+  /* Progress Bar */
+  .prog-track { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .prog-fill { height: 100%; background: var(--blue-light); transition: width 0.25s; }
+
+  /* Modal & Toast */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 60;
+    display: flex; align-items: center; justify-content: center; padding: 14px;
+  }
+  .modal-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .cat-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 7px 13px; border-radius: 18px; font-size: 13px; font-weight: 600;
+    background: var(--surface-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
+  }
+  .chip.selected { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .toast {
+    position: fixed; top: 76px; left: 50%; transform: translateX(-50%); z-index: 99;
+    background: #1f2937; color: #fff; border: 1px solid var(--blue-light);
+    padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .toast.show { opacity: 1; }
+  .info-quote { background: var(--surface-2); border-left: 3px solid var(--blue-light); padding: 10px 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="shop-title" id="hdrShopName">大成</div>
+    <div class="shop-sub" id="hdrSub">最后盘点 -- · 0 个产品</div>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()" title="切换日/夜间模式">☀️</button>
+</header>
+
+<main id="mainApp"></main>
+
+<div id="floatingBar">
+  <div class="float-inner">
+    <button class="btn btn-dark" style="white-space:nowrap;" onclick="fillSameAsYesterday()">和昨天一样</button>
+    <button class="btn btn-dark" style="padding:11px;" onclick="toggleCollapseAll()" title="展开/收起全部分类">⊞</button>
+    <button class="btn btn-blue" style="flex:1;" id="btnSendWa" onclick="openWaModal()">发送至 WhatsApp (0/0)</button>
+  </div>
+</div>
+
+<nav>
+  <button class="nav-item active" data-tab="count" onclick="switchTab('count')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+    <span>盘点</span>
+  </button>
+  <button class="nav-item" data-tab="stats" onclick="switchTab('stats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16M7 20v-6M12 20V8M17 20v-10"/></svg>
+    <span>统计</span>
+  </button>
+  <button class="nav-item" data-tab="products" onclick="switchTab('products')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/></svg>
+    <span>产品</span>
+  </button>
+  <button class="nav-item" data-tab="settings" onclick="switchTab('settings')">大成库存管理系统
+
+
+:root {
+--bg: #0f1115;
+--surface: #181b21;
+--surface-2: #22262f;
+--border: #2c313d;
+--text: #f3f4f6;
+--muted: #9ca3af;
+--blue: #2563eb;
+--blue-light: #3b82f6;
+--red-bg: rgba(239, 68, 68, 0.16);
+--red-text: #f87171;
+--green-text: #34d399;
+}
+body.light-mode {
+--bg: #f3f4f6;
+--surface: #ffffff;
+--surface-2: #e5e7eb;
+--border: #d1d5db;
+--text: #111827;
+--muted: #6b7280;
+--red-bg: #fee2e2;
+--red-text: #dc2626;
+--green-text: #059669;
+}
+• { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+background: var(--bg); color: var(--text);
+font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+padding-top: calc(64px + env(safe-area-inset-top));
+padding-bottom: calc(132px + env(safe-area-inset-bottom));
+min-height: 100vh; transition: background 0.2s, color 0.2s;
+}
+header {
+position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+height: calc(64px + env(safe-area-inset-top));
+padding: env(safe-area-inset-top) 16px 0;
+background: var(--bg); border-bottom: 1px solid var(--border);
+display: flex; align-items: center; justify-content: space-between;
+}
+.shop-title { font-size: 19px; font-weight: 800; }
+.shop-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.theme-btn {
+width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+background: var(--surface); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+main { max-width: 600px; margin: 0 auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+#floatingBar {
+position: fixed; left: 0; right: 0; bottom: calc(62px + env(safe-area-inset-bottom)); z-index: 35;
+background: var(--bg); border-top: 1px solid var(--border); padding: 8px 14px;
+}
+.float-inner { max-width: 600px; margin: 0 auto; display: flex; gap: 8px; align-items: center; }
+nav {
+position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+height: calc(62px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
+background: var(--surface); border-top: 1px solid var(--border);
+display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.nav-item {
+background: none; border: none; color: var(--muted);
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+font-size: 11px; font-weight: 600; cursor: pointer;
+}
+.nav-item svg { width: 21px; height: 21px; }
+.nav-item.active { color: var(--blue-light); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+.card-hd { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+input, select, textarea {
+width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none;
+}
+input:focus, textarea:focus { border-color: var(--blue-light); }
+.btn {
+border: none; border-radius: 10px; padding: 11px 14px; font-size: 14px; font-weight: 700;
+cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn:active { transform: scale(0.98); }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-dark { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+.btn-full { width: 100%; }
+.pills-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.pills-row::-webkit-scrollbar { display: none; }
+.pill {
+white-space: nowrap; padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+background: var(--surface-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
+}
+.pill.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+.cat-header {
+background: var(--surface-2); padding: 11px 14px; border-radius: 12px;
+display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 14px; cursor: pointer;
+}
+.p-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.p-top { display: flex; gap: 12px; align-items: center; }
+.p-thumb {
+width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+background: var(--surface-2); border: 1px solid var(--border); flex-shrink: 0;
+display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted);
+}
+.low-tag { background: var(--red-bg); color: var(--red-text); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; margin-left: 6px; }
+.rem-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.rem-input {
+width: 105px; height: 44px; text-align: center; font-size: 18px; font-weight: 800;
+border: 2px solid var(--blue); background: var(--bg); border-radius: 10px;
+}
+.quick-btns { display: flex; gap: 8px; }
+.q-btn {
+padding: 6px 14px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--border);
+color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.q-btn:active { background: var(--blue); color: #fff; }
+.ws-box { border-top: 1px solid var(--border); padding-top: 10px; }
+.ws-grid { display: grid; grid-template-columns: 95px 1fr; gap: 8px; margin-top: 6px; }
+.prog-track { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.prog-fill { height: 100%; background: var(--blue-light); transition: width 0.25s; }
+.modal-bg {
+position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 60;
+display: flex; align-items: center; justify-content: center; padding: 14px;
+}
+.modal-card {
+background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+}
+.cat-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+padding: 7px 13px; border-radius: 18px; font-size: 13px; font-weight: 600;
+background: var(--surface-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
+}
+.chip.selected { background: var(--blue); color: #fff; border-color: var(--blue); }
+.toast {
+position: fixed; top: 76px; left: 50%; transform: translateX(-50%); z-index: 99;
+background: #1f2937; color: #fff; border: 1px solid var(--blue-light);
+padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.toast.show { opacity: 1; }
+.info-quote { background: var(--surface-2); border-left: 3px solid var(--blue-light); padding: 10px 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+
+
+大成
+最后盘点 -- · 0 个产品
+
+☀️
+和昨天一样
+⊞
+发送至 WhatsApp (0/0)
+
+盘点
+
+
+
+统计
+
+
+
+产品
+
+
+
+设定
+
+const DEFAULT_CATEGORIES = [
+'蔬菜和菇', '豆类', '培根类', '鸡肉类', '鸭肉类', '猪肉类',
+'蛋类', '海鲜类', '丸类', '香肠类', '肉片类', '馒头类', '其他类', '酱料类'
+];
+const PRESET_PRODUCTS = [
+{ id: 'pr_1', name: 'KING OYSTER 杏鲍菇', price: 0.50, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 20, emoji: '🍄' },
+{ id: 'pr_2', name: 'BUNA SHIMEIJI 灵芝菇', price: 0.55, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 20, emoji: '🍄' },
+{ id: 'pr_3', name: 'SHITAKE 花菇', price: 0.60, cat: '蔬菜和菇', spec: '1 stick2', unit: '支', low: 20, emoji: '🍄' },
+{ id: 'pr_4', name: 'JAGUNG 玉蜀黍（大）', price: 0.60, cat: '蔬菜和菇', spec: '10 Sticks/bag', unit: '支', low: 20, emoji: '🌽' },
+{ id: 'pr_5', name: 'WHITE BUTTON MUSHROOM 白蘑菇', price: 0.55, cat: '蔬菜和菇', spec: '20 Sticks/bag', unit: '支', low: 20, emoji: '🍄' },
+{ id: 'pr_6', name: 'KACANG PANJANG 长豆', price: 0.50, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 20, emoji: '🥬' },
+{ id: 'pr_7', name: 'BENDI 羊角豆', price: 0.50, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 20, emoji: '🥬' },
+{ id: 'pr_8', name: 'BABY BRINJAL 茄子', price: 0.50, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 15, emoji: '🍆' },
+{ id: 'pr_9', name: 'ABALONE MUSHROOM 鲍鱼菇', price: 0.55, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 15, emoji: '🍄' },
+{ id: 'pr_10', name: 'BROCCOLI 西兰花', price: 0.60, cat: '蔬菜和菇', spec: '1 stick', unit: '支', low: 15, emoji: '🥦' },
+{ id: 'pr_11', name: 'TAU POK 豆卜', price: 0.50, cat: '豆类', spec: '1 stick', unit: '支', low: 20, emoji: '🟨' },
+{ id: 'pr_12', name: 'FU CHUK 炸腐竹', price: 0.60, cat: '豆类', spec: '1 stick', unit: '支', low: 20, emoji: '捲' },
+{ id: 'pr_13', name: 'BACON ENOKI 培根金针菇', price: 1.20, cat: '培根类', spec: '1 stick', unit: '支', low: 15, emoji: '🥓' },
+{ id: 'pr_14', name: 'SMOKED DUCK 烟熏鸭胸', price: 1.20, cat: '鸭肉类', spec: '1 stick', unit: '支', low: 15, emoji: '🦆' },
+{ id: 'pr_15', name: 'CHICKEN MID WING 鸡中翅', price: 1.50, cat: '鸡肉类', spec: '1 stick', unit: '支', low: 15, emoji: '🍗' },
+{ id: 'pr_16', name: 'PORK BELLY 五花肉片', price: 1.20, cat: '猪肉类', spec: '1 stick', unit: '支', low: 15, emoji: '🥩' },
+{ id: 'pr_17', name: 'QUAIL EGG 鹌鹑蛋', price: 0.80, cat: '蛋类', spec: '1 stick3', unit: '支', low: 15, emoji: '🥚' },
+{ id: 'pr_18', name: 'PRAWN 鲜虾串', price: 1.50, cat: '海鲜类', spec: '1 stick', unit: '支', low: 15, emoji: '🦐' },
+{ id: 'pr_19', name: '75 MEATBALL 肉丸', price: 0.60, cat: '丸类', spec: '1 stick3', unit: '支', low: 20, emoji: '🍡' },
+{ id: 'pr_20', name: 'CHEESE TOFU 芝士豆腐', price: 0.70, cat: '丸类', spec: '1 stick2', unit: '支', low: 20, emoji: '🧀' },
+{ id: 'pr_21', name: 'TAIWAN SAUSAGE 台湾香肠', price: 1.20, cat: '香肠类', spec: '1 stick', unit: '支', low: 15, emoji: '🌭' },
+{ id: 'pr_22', name: 'MANTOU 黄金小馒头', price: 0.60, cat: '馒头类', spec: '1 stick*2', unit: '支', low: 15, emoji: '🥯' }
+];
+const K_PRODS = 'dc_v2_products';
+const K_RECS = 'dc_v2_records';
+const K_CFG = 'dc_v2_settings';
+let appState = {
+tab: 'count',
+date: getLocalDate(0),
+selectedCat: 'ALL',
+search: '',
+collapsedCats: {},
+statsDays: 7,
+statsView: 'chart',
+products: JSON.parse(localStorage.getItem(K_PRODS) || '[]'),
+records: JSON.parse(localStorage.getItem(K_RECS) || '{}'),
+settings: JSON.parse(localStorage.getItem(K_CFG) || JSON.stringify({
+shopName: '大成',
+defaultLow: 5,
+whatsapp: '',
+categories: DEFAULT_CATEGORIES
+}))
+};
+function getLocalDate(offset = 0) {
+const d = new Date();
+d.setDate(d.getDate() + offset);
+const tz = d.getTimezoneOffset() * 60000;
+return new Date(d.getTime() - tz).toISOString().split('T')[0];
+}
+function formatCnDate(dateStr) {
+if (!dateStr) return '--';
+const [y, m, d] = dateStr.split('-');
+return ${Number(m)}月${Number(d)}日;
+}
+function formatCnDateWeek(dateStr) {
+const weeks = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+const dt = new Date(dateStr + 'T00:00:00');
+return ${formatCnDate(dateStr)}${weeks[dt.getDay()]};
+}
+function saveStore() {
+localStorage.setItem(K_PRODS, JSON.stringify(appState.products));
+localStorage.setItem(K_RECS, JSON.stringify(appState.records));
+localStorage.setItem(K_CFG, JSON.stringify(appState.settings));
+}
+function toast(msg) {
+const el = document.getElementById('toast');
+el.textContent = msg;
+el.classList.add('show');
+setTimeout(() => el.classList.remove('show'), 2200);
+}
+function toggleTheme() {
+document.body.classList.toggle('light-mode');
+}
+function getLastRecordBefore(prodId, dateStr) {
+const prevDates = Object.keys(appState.records).filter(d => d < dateStr).sort().reverse();
+for (const d of prevDates) {
+const r = appState.records[d] && appState.records[d][prodId];
+if (r && r.rem !== '' && r.rem !== undefined && r.rem !== null) {
+return { date: d, rem: Number(r.rem) };
+}
+}
+return null;
+}
+function getLatestRem(prodId) {
+const allDates = Object.keys(appState.records).sort().reverse();
+for (const d of allDates) {
+const r = appState.records[d] && appState.records[d][prodId];
+if (r && r.rem !== '' && r.rem !== undefined && r.rem !== null) {
+return Number(r.rem);
+}
+}
+return null;
+}
+function isDateEditable(dateStr) {
+const minEditable = getLocalDate(-2);
+return dateStr >= minEditable;
+}
+function calcDayStats(dateStr) {
+const dayMap = appState.records[dateStr] || {};
+let filled = 0, soldCount = 0, restockCount = 0, wasteCount = 0, wasteAmt = 0, salesAmt = 0;
+appState.products.forEach(p => {
+const r = dayMap[p.id];
+if (r && r.rem !== '' && r.rem !== undefined && r.rem !== null) {
+filled++;
+const curRem = Number(r.rem);
+const prev = getLastRecordBefore(p.id, dateStr);
+if (prev) {
+const diff = prev.rem - curRem;
+if (diff > 0) {
+soldCount += diff;
+salesAmt += diff * p.price;
+} else if (diff < 0) {
+restockCount += Math.abs(diff);
+}
+}
+}
+if (r && Number(r.waste) > 0) {
+const w = Number(r.waste);
+wasteCount += w;
+wasteAmt += w * p.price;
+}
+});
+return { filled, total: appState.products.length, soldCount, restockCount, wasteCount, wasteAmt, salesAmt };
+}
+function render() {
+const recordedDates = Object.keys(appState.records).sort().reverse();
+const lastDate = recordedDates[0] ? formatCnDate(recordedDates[0]) : '暂无';
+document.getElementById('hdrShopName').textContent = appState.settings.shopName || '大成';
+document.getElementById('hdrSub').textContent = 最后盘点 ${lastDate} · ${appState.products.length} 个产品;
+document.querySelectorAll('.nav-item').forEach(el => {
+el.classList.toggle('active', el.dataset.tab === appState.tab);
+});
+const floatBar = document.getElementById('floatingBar');
+floatBar.style.display = appState.tab === 'count' ? 'block' : 'none';
+const main = document.getElementById('mainApp');
+if (appState.tab === 'count') main.innerHTML = viewCount();
+else if (appState.tab === 'stats') main.innerHTML = viewStats();
+else if (appState.tab === 'products') main.innerHTML = viewProducts();
+else if (appState.tab === 'settings') main.innerHTML = viewSettings();
+}
+function viewCount() {
+const stats = calcDayStats(appState.date);
+const editable = isDateEditable(appState.date);
+const pct = stats.total ? Math.round((stats.filled / stats.total) * 100) : 0;
+document.getElementById('btnSendWa').textContent = 发送至 WhatsApp (${stats.filled}/${stats.total});
+const cats = ['ALL', ...(appState.settings.categories || DEFAULT_CATEGORIES)];
+const filtered = appState.products.filter(p => {
+const matchCat = appState.selectedCat === 'ALL' || p.cat === appState.selectedCat;
+const matchKw = p.name.toLowerCase().includes(appState.search.toLowerCase());
+return matchCat && matchKw;
+});
+const groups = {};
+filtered.forEach(p => {
+if (!groups[p.cat]) groups[p.cat] = [];
+groups[p.cat].push(p);
+});
+const allExpanded = Object.values(appState.collapsedCats).every(v => !v);
+return \${!editable ?🔒 历史日期只读模式（仅支持修改今天、昨天、前天）` : ''}
+
+盘点日期
+
+
+已填 stats.filled / {stats.total}
+
+
+${allExpanded ? '全部收起' : '全部展开'}
+${cats.filter(c => c !== 'ALL').map(c => <button class="pill ${appState.selectedCat === c ? 'active' : ''}" onclick="selectCat('${c}')">${c}</button>).join('')}
+${appState.selectedCat !== 'ALL' ? <button class="pill" onclick="selectCat('ALL')">✕ 清除筛选</button> : ''}
+${appState.products.length === 0 ?  <div class="card" style="text-align:center;padding:28px 16px;"> <div style="font-weight:800;font-size:16px;margin-bottom:8px;">还没有任何产品</div> <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">你可以一键载入完整分类清单，或自行新增产品。</p> <button class="btn btn-blue btn-full" onclick="loadPresetList()">✨ 载入全部预设产品清单</button> </div> : ''}
+${Object.keys(groups).map(cat => {
+const items = groups[cat];
+const doneInCat = items.filter(p => {
+const r = appState.records[appState.date] && appState.records[appState.date][p.id];
+return r && r.rem !== '' && r.rem !== undefined;
+}).length;
+const isCollapsed = !!appState.collapsedCats[cat];
+return  <div style="display:flex;flex-direction:column;gap:10px;"> <div class="cat-header" onclick="toggleCat('\${cat}')"> <span>\({isCollapsed ? '▸' : '▾'} &nbsp;\){cat}</span> <span style="color:var(--muted);font-size:13px;">doneInCat / {items.length}</span> </div> \${!isCollapsed ? items.map(p => renderCountCard(p, editable)).join('') : ''} </div>;
+}).join('')}
+`;
+}
+function renderCountCard(p, editable) {
+const rec = (appState.records[appState.date] && appState.records[appState.date][p.id]) || {};
+const prev = getLastRecordBefore(p.id, appState.date);
+const hasRem = rec.rem !== '' && rec.rem !== undefined && rec.rem !== null;
+const isLow = hasRem && Number(rec.rem) <= p.low;
+return <div class="p-card"> <div class="p-top"> \${p.img ?:${p.emoji || '🍢'}} <div style="flex:1;min-width:0;"> <div style="font-weight:800;font-size:15px;line-height:1.3;">\${p.name}</div> <div style="font-size:12px;color:var(--muted);margin-top:3px;">RM Number(p.price).toFixed(2) · {p.spec || '1 stick'}</div> <div style="font-size:12px;color:var(--muted);margin-top:3px;"> \${prev ? 上次 ${formatCnDate(prev.date)} 是 ${prev.rem} ${p.unit}: '首次盘点'} \${isLow ?库存偏低` : ''}
+
+
+剩余数量:
+<input type="number" min="0" class="rem-input" ${!editable ? 'disabled' : ''}
+value="${hasRem ? rec.rem : ''}" placeholder="-"
+onchange="updateRec('${p.id}','rem',this.value)">
+${p.unit}
+${editable ?  <div class="quick-btns"> <button class="q-btn" onclick="quickSetRem('${p.id}', 10)">10</button> <button class="q-btn" onclick="quickSetRem('${p.id}', 30)">30</button> <button class="q-btn" onclick="quickSetRem('${p.id}', 50)">50</button> </div> : ''}
+损耗 WS
+
+
+个数
+<input type="number" min="0" ${!editable ? 'disabled' : ''} style="text-align:center;font-weight:700;"
+value="rec.waste ?? 0" onchange="updateRec('{p.id}','waste',this.value)">
+
+
+原因
+<input type="text" ${!editable ? 'disabled' : ''} placeholder="原因（可不填）"
+value="rec.wasteReason || ''" onchange="updateRec('{p.id}','wasteReason',this.value)">
+
+
+
+`;
+}
+function viewStats() {
+const dates = [];
+for (let i = appState.statsDays - 1; i >= 0; i--) dates.push(getLocalDate(-i));
+const activeDays = dates.filter(d => appState.records[d] && Object.keys(appState.records[d]).length > 0);
+const countedProdSet = new Set();
+activeDays.forEach(d => Object.keys(appState.records[d]).forEach(pid => countedProdSet.add(pid)));
+return <div class="card" style="padding:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;"> \${[1, 2, 7, 30].map((d, idx) => { const labels = ['今天', '昨天', '7 天', '30 天']; return${labels[idx]}`;
+}).join('')}
+${dates[0]} — \({dates[dates.length - 1]} · 其中 \){activeDays.length} 天有盘点
+有盘点的产品
+${countedProdSet.size}
+
+
+盘点天数
+${activeDays.length}
+共 ${appState.statsDays} 天
+
+剩余数量走势
+${countedProdSet.size} 个产品每天的剩余数量
+
+${appState.statsView === 'chart' ? '表格' : '走势图'}
+${appState.products.map(p => {
+const pts = dates.map(d => {
+const r = appState.records[d] && appState.records[d][p.id];
+return (r && r.rem !== '' && r.rem !== undefined) ? Number(r.rem) : null;
+}).filter(v => v !== null);
+if (!pts.length) return '';
+const latest = pts[pts.length - 1];
+const minV = Math.min(...pts);
+const maxV = Math.max(...pts);
+return <div style="border-top:1px solid var(--border);padding-top:12px;"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"> <strong style="font-size:14px;">\${p.name}</strong> <span style="font-size:18px;font-weight:800;">\${latest} <small style="font-size:12px;color:var(--muted);">\${p.unit}</small></span> </div> \${appState.statsView === 'chart' ? renderSparkline(pts, minV, maxV, dates[0], dates[dates.length-1]) :区间记录：${pts.join(' → ')} ${p.unit}} </div>;
+}).join('') || '所选时间段内暂无盘点走势数据'}
+
+`;
+}
+function renderSparkline(pts, minV, maxV, startD, endD) {
+const w = 110, h = 44;
+const span = Math.max(1, maxV - minV);
+const coords = pts.map((v, i) => {
+const x = pts.length === 1 ? w / 2 : (i / (pts.length - 1)) * (w - 12) + 6;
+const y = h - 8 - ((v - minV) / span) * (h - 16);
+return ${x},${y};
+});
+const lastPt = coords[coords.length - 1].split(',');
+return  <div style="display:flex;justify-content:space-between;align-items:flex-end;"> <div style="font-size:11px;color:var(--muted);"> <div>${formatCnDate(startD)}</div> <div style="margin-top:4px;">最低 ${minV} · 最高 ${maxV}</div> </div> <div style="text-align:right;"> <svg width="${w}" height="${h}" style="background:rgba(59,130,246,0.12);border-radius:6px;"> <polyline fill="none" stroke="#3b82f6" stroke-width="2.5" points="${coords.join(' ')}" /> <circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="3.5" fill="#93c5fd" /> </svg> <div style="font-size:11px;color:var(--muted);margin-top:2px;">${formatCnDate(endD)}</div> </div> </div>;
+}
+function viewProducts() {
+const list = appState.products.filter(p => p.name.toLowerCase().includes(appState.search.toLowerCase()));
+return `
+
+
+新增产品
+${list.map(p => {
+const rem = getLatestRem(p.id);
+return <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;" onclick="openProdEditor('\${p.id}')"> <div style="display:flex;align-items:center;gap:12px;min-width:0;"> \${p.img ?:${p.emoji || '🍢'}} <div style="min-width:0;"> <div style="font-weight:800;font-size:14px;">\${p.name}</div> <div style="font-size:12px;color:var(--muted);margin-top:3px;">\({p.cat} &nbsp;RM\){Number(p.price).toFixed(2)} &nbsp;\({p.spec} &nbsp;提醒值 \){p.low}</div> </div> </div> <div style="text-align:right;flex-shrink:0;"> <div style="font-size:19px;font-weight:800;">\${rem !== null ? rem : '-'}</div> <div style="font-size:11px;color:var(--muted);">剩余 \${p.unit}</div> </div> </div>;
+}).join('') || '暂无产品，点击右上角「新增产品」或到「设定」一键载入清单'}
+
+`;
+}
+function viewSettings() {
+const recDates = Object.keys(appState.records).sort().reverse();
+const dataSizeKb = Math.max(1, Math.round(JSON.stringify(localStorage).length / 1024));
+return `
+
+店铺
+
+店名
+
+
+
+预设低库存警告值
+
+新增产品时用这个值。数量掉到这里就提醒你。
+
+
+发送到这个 WhatsApp 号码
+
+国际格式，不用 + 号，开头不用 0。马来西亚 012-867 4931 → 打 60128674931
+
+产品清单（自动 / 批量添加）
+载入预设串串产品清单，或一次性粘贴多行产品自动生成。
+
+载入全部预设产品
+⚡ 批量粘贴新增
+
+资料
+全部只存在这台装置里，请定期备份。约 ${dataSizeKb} KB
+
+汇出 Excel (.xlsx)
+汇出 CSV
+汇出备份 (.json)
+还原备份
+填入示范资料
+清空全部资料
+
+盘点纪录
+${recDates.map(d => {
+const s = calcDayStats(d);
+return  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"> <span style="font-weight:700;font-size:14px;">${formatCnDateWeek(d)}</span> <div style="display:flex;align-items:center;gap:10px;"> <span style="font-size:12px;color:var(--muted);">${s.filled} 个产品 · 卖出 ${s.soldCount}</span> <button class="btn btn-dark btn-sm" onclick="openHistoryDate('${d}')">打开</button> </div> </div>;
+}).join('') || '暂无历史盘点纪录'}
+说明
+每天打烊时，每个产品填一个 剩余数量，有丢掉的就填损耗。跟上一次的数量比：
+
+数量变少 → 卖掉了那么多
+
+数量变多 → 进了那么多货
+
+
+和昨天一样会把还没填的产品自动补上它上次的数量，代表这些今天没动过。已经填过的不会被覆盖。
+
+
+只能改今天、昨天、前天，更早的日期打开是只读的。
+
+
+损耗金额 = 损耗个数 × 单价。损耗不会从剩余数量里扣掉，两个数字各自独立。
+
+
+`;
+}
+function switchTab(t) { appState.tab = t; appState.search = ''; render(); window.scrollTo(0, 0); }
+function changeDate(d) { appState.date = d; render(); }
+function setSearch(q) { appState.search = q; render(); }
+function selectCat(c) { appState.selectedCat = c; render(); }
+function toggleCat(c) { appState.collapsedCats[c] = !appState.collapsedCats[c]; render(); }
+function setStatsDays(d) { appState.statsDays = d; render(); }
+function toggleStatsView() { appState.statsView = appState.statsView === 'chart' ? 'table' : 'chart'; render(); }
+function openHistoryDate(d) { appState.date = d; appState.tab = 'count'; render(); }
+function toggleCollapseAll() {
+const cats = appState.settings.categories || DEFAULT_CATEGORIES;
+const anyOpen = cats.some(c => !appState.collapsedCats[c]);
+cats.forEach(c => appState.collapsedCats[c] = anyOpen);
+render();
+}
+function updateRec(pid, field, val) {
+if (!isDateEditable(appState.date)) return toast('超过3天的历史记录不可修改');
+if (!appState.records[appState.date]) appState.records[appState.date] = {};
+if (!appState.records[appState.date][pid]) appState.records[appState.date][pid] = { rem: '', waste: 0, wasteReason: '' };
+if (field === 'rem') appState.records[appState.date][pid].rem = val === '' ? '' : Number(val);
+else if (field === 'waste') appState.records[appState.date][pid].waste = val === '' ? 0 : Number(val);
+else appState.records[appState.date][pid].wasteReason = val;
+saveStore();
+render();
+}
+function quickSetRem(pid, num) {
+updateRec(pid, 'rem', num);
+}
+function fillSameAsYesterday() {
+if (!isDateEditable(appState.date)) return toast('只读日期无法修改');
+if (!appState.records[appState.date]) appState.records[appState.date] = {};
+let cnt = 0;
+appState.products.forEach(p => {
+const cur = appState.records[appState.date][p.id];
+if (!cur || cur.rem === '' || cur.rem === undefined || cur.rem === null) {
+const prev = getLastRecordBefore(p.id, appState.date);
+if (prev) {
+appState.records[appState.date][p.id] = {
+rem: prev.rem,
+waste: cur ? cur.waste : 0,
+wasteReason: cur ? cur.wasteReason : ''
+};
+cnt++;
+}
+}
+});
+saveStore();
+render();
+toast(已自动补齐 ${cnt} 个未动产品);
+}
+function saveSettingsNow() {
+appState.settings.shopName = document.getElementById('setShop').value.trim() || '大成';
+appState.settings.defaultLow = Number(document.getElementById('setLow').value) || 5;
+appState.settings.whatsapp = document.getElementById('setWa').value.replace(/\D/g, '');
+saveStore();
+render();
+toast('设定已自动保存');
+}
+let editingProdImg = '';
+let editingProdCat = '';
+function openProdEditor(pid = null) {
+const p = pid ? appState.products.find(x => x.id === pid) : {
+id: '', name: '', price: '', cat: (appState.settings.categories[0] || '蔬菜和菇'), spec: '1 stick', unit: '支', low: appState.settings.defaultLow, img: ''
+};
+editingProdImg = p.img || '';
+editingProdCat = p.cat;
+const cats = appState.settings.categories || DEFAULT_CATEGORIES;
+document.getElementById('modalLayer').innerHTML = `
+
+
+
+${pid ? '编辑产品' : '新增产品'}
+✕
+照片
+
+
+${editingProdImg ? <img src="${editingProdImg}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;"> : '🍢'}
+
+📷 拍照 / 选图
+支持手机拍照或相册上传，自动压缩保存。
+
+
+产品名称
+
+单价 RM
+
+
+
+分类
+
+${cats.map(c => <button type="button" class="chip ${c === editingProdCat ? 'selected' : ''}" onclick="pickModalCat(this,'${c}')">${c}</button>).join('')}
++ 新分类
+
+
+包装规格
+
+
+
+单位
+
+
+低库存提醒值
+
+${pid ? <button class="btn btn-dark" style="color:var(--red-text);" onclick="deleteProd('\${p.id}')">删除</button> : ''}
+保存产品
+
+
+`;
+}
+function pickModalCat(btn, cat) {
+editingProdCat = cat;
+document.querySelectorAll('#catChipsBox .chip').forEach(el => el.classList.remove('selected'));
+btn.classList.add('selected');
+}
+function addNewCategory() {
+const name = prompt('请输入新分类名称：');
+if (!name || !name.trim()) return;
+const clean = name.trim();
+if (!appState.settings.categories.includes(clean)) {
+appState.settings.categories.push(clean);
+saveStore();
+}
+editingProdCat = clean;
+const pidMatch = document.querySelector('#modalLayer button[onclick^="saveProdEditor"]').getAttribute('onclick').match(/'(.*)'/);
+openProdEditor(pidMatch && pidMatch[1] ? pidMatch[1] : null);
+}
+function handlePhotoUpload(e) {
+const file = e.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = ev => {
+const img = new Image();
+img.onload = () => {
+const canvas = document.createElement('canvas');
+const maxW = 180;
+const scale = Math.min(1, maxW / img.width);
+canvas.width = img.width * scale;
+canvas.height = img.height * scale;
+canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+editingProdImg = canvas.toDataURL('image/jpeg', 0.72);
+document.getElementById('imgPreviewBox').innerHTML = <img src="${editingProdImg}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">;
+};
+img.src = ev.target.result;
+};
+reader.readAsDataURL(file);
+}
+function saveProdEditor(pid) {
+const name = document.getElementById('edName').value.trim();
+const price = parseFloat(document.getElementById('edPrice').value) || 0;
+const spec = document.getElementById('edSpec').value.trim() || '1 stick';
+const unit = document.getElementById('edUnit').value.trim() || '支';
+const low = parseInt(document.getElementById('edLow').value) || 5;
+if (!name) return toast('请输入产品名称');
+if (pid) {
+const idx = appState.products.findIndex(x => x.id === pid);
+if (idx > -1) appState.products[idx] = { ...appState.products[idx], name, price, cat: editingProdCat, spec, unit, low, img: editingProdImg };
+} else {
+appState.products.push({ id: 'p_' + Date.now(), name, price, cat: editingProdCat, spec, unit, low, img: editingProdImg, emoji: '🍢' });
+}
+saveStore();
+closeModal();
+render();
+toast('产品已保存');
+}
+function deleteProd(pid) {
+if (!confirm('确定删除此产品？')) return;
+appState.products = appState.products.filter(x => x.id !== pid);
+saveStore();
+closeModal();
+render();
+toast('已删除');
+}
+function openBatchAddModal() {
+document.getElementById('modalLayer').innerHTML =  <div class="modal-bg" onclick="if(event.target===this)closeModal()"> <div class="modal-card"> <div style="display:flex;justify-content:space-between;align-items:center;"> <strong style="font-size:16px;">⚡ 批量粘贴自动添加产品</strong> <button class="theme-btn" style="width:32px;height:32px;" onclick="closeModal()">✕</button> </div> <p style="font-size:12px;color:var(--muted);line-height:1.5;"> 每行写一个产品，格式：<strong>产品名, 单价, 分类</strong>（不写单价和分类会自动用默认值）<br> 例如：<br> <span style="color:var(--blue-light);">鱼饼 FISH CAKE, 0.60, 丸类<br> 鸡肉串 CHICKEN SKEWER, 1.20, 鸡肉类</span> </p> <textarea id="batchInput" rows="8" placeholder="在此粘贴你的产品清单..."></textarea> <button class="btn btn-blue btn-full" onclick="processBatchAdd()">一键全部加入产品库</button> </div> </div>;
+}
+function processBatchAdd() {
+const lines = document.getElementById('batchInput').value.split('\n').map(l => l.trim()).filter(Boolean);
+if (!lines.length) return toast('请先粘贴产品内容');
+let added = 0;
+lines.forEach((line, idx) => {
+const parts = line.split(/[,，\t]/).map(s => s.trim());
+const name = parts[0];
+if (!name) return;
+if (appState.products.some(p => p.name === name)) return;
+const price = parseFloat(parts[1]) || 0.50;
+const cat = parts[2] || (appState.settings.categories[0]) || '其他类';
+if (!appState.settings.categories.includes(cat)) appState.settings.categories.push(cat);
+appState.products.push({
+id: 'p_' + Date.now() + '_' + idx,
+name, price, cat, spec: '1 stick', unit: '支', low: appState.settings.defaultLow, emoji: '🍢'
+});
+added++;
+});
+saveStore();
+closeModal();
+render();
+toast(成功批量添加 ${added} 个产品！);
+}
+function openWaModal() {
+const s = calcDayStats(appState.date);
+const lowList = [], wasteList = [], remLines = [];
+appState.products.forEach(p => {
+const r = appState.records[appState.date] && appState.records[appState.date][p.id];
+if (r && r.rem !== '' && r.rem !== undefined) {
+remLines.push(• ${p.name}: ${r.rem}${p.unit});
+if (Number(r.rem) <= p.low) lowList.push(• ${p.name}: 剩 ${r.rem}${p.unit} (警戒≤${p.low}));
+}
+if (r && Number(r.waste) > 0) {
+wasteList.push(• ${p.name}: ${r.waste}${p.unit} (RM ${(Number(r.waste)*p.price).toFixed(2)}) ${r.wasteReason ? '['+r.wasteReason+']' : ''});
+}
+});
+const text = `📋【${appState.settings.shopName}】
+盘点报告
+📅 日期：appState.date ({formatCnDateWeek(appState.date)})
+✅ 进度：已盘点 s.filled / {s.total} 项
+━━━━━━━━━━━━━━━━━━
+📉 较上次减少（卖出）：s.soldCount 支 (约 RM {s.salesAmt.toFixed(2)})
+📈 较上次增加（进货）：${s.restockCount} 支
+🗑️ 今日损耗 WS：s.wasteCount 支 (RM {s.wasteAmt.toFixed(2)})
+━━━━━━━━━━━━━━━━━━
+🚨 低库存提醒 (\({lowList.length})：\){lowList.length ? lowList.join('\n') : '无'}
+⚠️ 损耗明细：
+${wasteList.length ? wasteList.join('\n') : '无'}
+📦 已盘点剩余明细：
+${remLines.length ? remLines.join('\n') : '暂未填写'}`;
+document.getElementById('modalLayer').innerHTML =  <div class="modal-bg" onclick="if(event.target===this)closeModal()"> <div class="modal-card"> <div style="display:flex;justify-content:space-between;align-items:center;"> <strong style="font-size:16px;">WhatsApp 盘点报告预览</strong> <button class="theme-btn" style="width:32px;height:32px;" onclick="closeModal()">✕</button> </div> <textarea id="waFinalText" rows="13" readonly style="font-size:12px;line-height:1.5;">${text}</textarea> <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"> <button class="btn btn-dark" onclick="copyReportText()">复制文字</button> <button class="btn btn-blue" onclick="launchWhatsApp()">打开 WhatsApp 发送</button> </div> </div> </div>;
+}
+function copyReportText() {
+const el = document.getElementById('waFinalText');
+el.select();
+navigator.clipboard.writeText(el.value);
+toast('报告已复制到剪贴板');
+}
+function launchWhatsApp() {
+const msg = encodeURIComponent(document.getElementById('waFinalText').value);
+const phone = appState.settings.whatsapp;
+window.open(phone ? https://wa.me{phone}?text=${msg} : https://wa.me{msg}, '_blank');
+}
+function closeModal() { document.getElementById('modalLayer').innerHTML = ''; }
+function loadPresetList() {
+let added = 0;
+PRESET_PRODUCTS.forEach(item => {
+if (!appState.products.some(p => p.name === item.name)) {
+appState.products.push({ ...item, id: 'p_' + Date.now() + '_' + added });
+added++;
+}
+});
+saveStore();
+render();
+toast(added ? 已载入 ${added} 项预设产品（不重复覆盖） : '预设产品已全部存在');
+}
+function fillDemoRecords() {
+if (!appState.products.length) loadPresetList();
+const yest = getLocalDate(-1);
+const today = getLocalDate(0);
+if (!appState.records[yest]) appState.records[yest] = {};
+if (!appState.records[today]) appState.records[today] = {};
+appState.products.forEach((p, i) => {
+const base = 15 + (i % 4) * 10;
+appState.records[yest][p.id] = { rem: base, waste: 0, wasteReason: '' };
+appState.records[today][p.id] = { rem: Math.max(0, base - (i % 7)), waste: i % 5 === 0 ? 1 : 0, wasteReason: i % 5 === 0 ? '掉落' : '' };
+});
+saveStore();
+render();
+toast('已填入昨日与今日示范盘点资料');
+}
+function exportXlsx() {
+if (!appState.products.length) return toast('暂无产品资料');
+const rows = appState.products.map(p => {
+const r = (appState.records[appState.date] && appState.records[appState.date][p.id]) || {};
+const prev = getLastRecordBefore(p.id, appState.date);
+return {
+'日期': appState.date,
+'分类': p.cat,
+'产品名称': p.name,
+'规格': p.spec,
+'单价(RM)': p.price,
+'上次剩余': prev ? prev.rem : '',
+'今日剩余': r.rem ?? '',
+'损耗个数': r.waste ?? 0,
+'损耗金额(RM)': Number(((r.waste || 0) * p.price).toFixed(2)),
+'损耗原因': r.wasteReason || ''
+};
+});
+const wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), appState.date);
+XLSX.writeFile(wb, ${appState.settings.shopName}_盘点_${appState.date}.xlsx);
+}
+function exportCsv() {
+if (!appState.products.length) return toast('暂无产品资料');
+const header = ['日期,分类,产品名称,规格,单价(RM),今日剩余,损耗个数,损耗原因'];
+const lines = appState.products.map(p => {
+const r = (appState.records[appState.date] && appState.records[appState.date][p.id]) || {};
+return ${appState.date},"${p.cat}","${p.name}","${p.spec}",${p.price},${r.rem ?? ''},${r.waste ?? 0},"${r.wasteReason || ''}";
+});
+const blob = new Blob(['\uFEFF' + header.concat(lines).join('\n')], { type: 'text/csv;charset=utf-8;' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = ${appState.settings.shopName}_盘点_${appState.date}.csv;
+a.click();
+}
+function exportJsonBackup() {
+const blob = new Blob([JSON.stringify({ products: appState.products, records: appState.records, settings: appState.settings }, null, 2)], { type: 'application/json' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = 大成备份_${getLocalDate(0)}.json;
+a.click();
+}
+function importJsonBackup(e) {
+const f = e.target.files[0];
+if (!f) return;
+const reader = new FileReader();
+reader.onload = ev => {
+try {
+const d = JSON.parse(ev.target.result);
+if (d.products) appState.products = d.products;
+if (d.records) appState.records = d.records;
+if (d.settings) appState.settings = d.settings;
+saveStore();
+render();
+toast('备份还原成功');
+} catch { toast('备份文件格式错误'); }
+};
+reader.readAsText(f);
+}
+function clearEverything() {
+if (!confirm('⚠️ 确定要清空全部资料吗？')) return;
+appState.products = [];
+appState.records = {};
+saveStore();
+render();
+toast('已清空全部资料');
+}
+render();
+
+
+</script>
+</body>
+</html>
+
