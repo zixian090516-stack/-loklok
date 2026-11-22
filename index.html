@@ -242,10 +242,10 @@ var PRESET_PRODUCTS = [
   { id:'pr_22', name:'MANTOU 黄金小馒头', price:0.60, cat:'馒头类', spec:'1 stick*2', unit:'支', low:15, emoji:'🥯', packQty:1, packCost:0, unitCost:0, initialStock:null, initDate: getLocalDate(0) }
 ];
 
-var K_PRODS = 'dc_v9_products';
-var K_RECS  = 'dc_v9_records';
-var K_CFG   = 'dc_v9_settings';
-var K_LOGS  = 'dc_v9_logs';
+var K_PRODS = 'dc_v10_products';
+var K_RECS  = 'dc_v10_records';
+var K_CFG   = 'dc_v10_settings';
+var K_LOGS  = 'dc_v10_logs';
 
 var appState = {
   tab: 'count',
@@ -275,7 +275,6 @@ function getLocalDate(offset) {
   offset = offset || 0;
   var d = new Date();
   
-  // 如果当前时间在凌晨 0:00 到 5:00 之间，算作前一天的营业日
   if (d.getHours() < 5) {
     d.setDate(d.getDate() - 1);
   }
@@ -439,7 +438,6 @@ function render() {
   else if (appState.tab === 'products') main.innerHTML = viewProducts();
   else if (appState.tab === 'settings') main.innerHTML = viewSettings();
 
-  // 【核心修复 2】恢复搜索框焦点（只对当前活动的搜索框生效）
   setTimeout(function(){
     var input = document.getElementById('mainSearchInput');
     if (input && document.activeElement !== input && appState.search !== '') {
@@ -936,7 +934,6 @@ function viewSettings() {
         '<button class="btn btn-blue btn-full" onclick="saveSettingsNow()">保存设定</button>' +
       '</div>' +
     '</div>' +
-    // 【核心修复 3】一键迁移旧数据
     '<div class="card" style="border-color:var(--blue-light);">' +
       '<div class="card-hd" style="color:var(--blue-light);">🪄 旧版系统数据一键迁移</div>' +
       '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">如果你以前在这个手机用过旧版的库存系统，点下方按钮可以自动把旧版数据（产品、历史记录）直接搬过来！</div>' +
@@ -959,7 +956,7 @@ function viewSettings() {
       '<div style="display:flex;flex-direction:column;gap:8px;">' +
         '<button class="btn btn-dark btn-full" onclick="exportExcelCsv()">汇出 Excel 表格 (.csv)</button>' +
         '<button class="btn btn-dark btn-full" onclick="exportJsonBackup()">汇出备份 (.json)</button>' +
-        '<label class="btn btn-dark btn-full" style="cursor:pointer;text-align:center;">还原备份<input type="file" accept=".json" style="display:none;" onchange="importJsonBackup(event)"></label>' +
+        '<button class="btn btn-dark btn-full" onclick="triggerImportJson()">还原备份 (.json)</button>' +
         '<button class="btn btn-dark btn-full" style="color:var(--red-text);" onclick="clearEverything()">清空全部资料</button>' +
       '</div>' +
     '</div>' +
@@ -989,12 +986,11 @@ function toggleCollapseAll() {
   render();
 }
 
-// 【核心修复 2】搜索防抖与焦点保持
+// 搜索防抖与焦点保持
 var searchTimer = null;
 function handleSearch(q) {
   appState.search = q;
   if (searchTimer) clearTimeout(searchTimer);
-  // 延迟 300 毫秒渲染，防止打字卡顿和频闪
   searchTimer = setTimeout(function() {
     render();
   }, 300);
@@ -1301,30 +1297,91 @@ function openBatchAddModal() {
           '<div style="font-weight:800;font-size:17px;">⚡ 批量粘贴自动添加</div>' +
           '<button class="btn btn-dark btn-sm" onclick="closeModal()">✕</button>' +
         '</div>' +
-        '<div class="info-quote">每行一个产品，格式：产品名, 售价, 分类。注：批量添加的产品期初库存默认为空，请稍后手动修改。</div>' +
-        '<textarea id="batchInput" rows="8" placeholder="鱼饼 FISH CAKE, 0.60, 丸类&#10;鸡肉串 CHICKEN SKEWER, 1.20, 鸡肉类"></textarea>' +
-        '<button class="btn btn-blue btn-full" onclick="processBatchAdd()">一键全部加入产品库</button>' +
+        '<div class="info-quote">【格式一】直接复制旧系统网页：把旧系统网页全选复制粘贴进来即可自动提取。<br><br>【格式二】每行一个产品：产品名, 售价, 分类</div>' +
+        '<textarea id="batchInput" rows="12" style="font-size:12px;" placeholder="把旧系统网页全选复制粘贴到这里..."></textarea>' +
+        '<button class="btn btn-blue btn-full" onclick="processBatchAdd()">智能解析并一键加入</button>' +
       '</div>' +
     '</div>';
 }
 function processBatchAdd() {
-  var lines = document.getElementById('batchInput').value.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
-  if (!lines.length) return toast('请先粘贴产品内容');
+  var rawText = document.getElementById('batchInput').value;
+  if (!rawText.trim()) return toast('请先粘贴产品内容');
+  
+  var lines = rawText.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
   var added = 0;
-  lines.forEach(function(line, idx) {
-    var parts = line.split(/[,，\t]/).map(function(s) { return s.trim(); });
-    var name = parts[0]; if (!name) return;
-    if (appState.products.some(function(p) { return p.name === name; })) return;
-    var price = parseFloat(parts[1]) || 0.50;
-    var cat = parts[2] || appState.settings.categories[0] || '其他类';
-    if (appState.settings.categories.indexOf(cat) === -1) appState.settings.categories.push(cat);
-    appState.products.push({
-      id:'p_' + Date.now() + '_' + idx, name:name, price:price, unitCost:0, packCost:0, initialStock:null, initDate:getLocalDate(0), cat:cat,
-      spec:'1 stick', unit:'支', packQty:1, low:appState.settings.defaultLow, emoji:'🍢'
-    });
-    added++;
-  });
-  addLog('批量新增', '批量添加了 ' + added + ' 个产品');
+  var currentCat = appState.settings.categories[0] || '其他类';
+  
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    
+    // 识别分类 (例如：▾蔬菜和菇14 / 19)
+    if (line.indexOf('▾') > -1 || line.indexOf('▸') > -1) {
+      var matchCat = line.match(/[▾▸](.+?)(\d+|$)/);
+      if (matchCat && matchCat[1]) {
+        var cName = matchCat[1].trim();
+        if (cName.length > 0) {
+          currentCat = cName;
+          if (appState.settings.categories.indexOf(currentCat) === -1) {
+            appState.settings.categories.push(currentCat);
+          }
+        }
+      }
+      continue;
+    }
+    
+    // 识别带 RM 的行 (例如：RM 0.50 · 1 stick)
+    if (line.indexOf('RM') > -1 && line.indexOf('·') > -1) {
+      // 找到上一个有效行作为产品名
+      if (i > 0) {
+        var pName = lines[i-1];
+        // 如果上一行包含“盘点”、“数量”、“元”等杂音，就跳过
+        if (pName.indexOf('剩余数量') > -1 || pName.indexOf('损耗') > -1 || pName.indexOf('：') > -1) continue;
+        
+        var priceMatch = line.match(/RM\s*([\d\.]+)/);
+        var specMatch = line.match(/·\s*(.+)/);
+        
+        if (priceMatch && pName) {
+          var price = parseFloat(priceMatch[1]);
+          var spec = specMatch ? specMatch[1].trim() : '1 stick';
+          
+          if (!appState.products.some(function(p) { return p.name === pName; })) {
+            appState.products.push({
+              id:'p_' + Date.now() + '_' + added, 
+              name:pName, 
+              price:price, 
+              unitCost:0, packCost:0, 
+              initialStock:null, initDate:getLocalDate(0), 
+              cat:currentCat,
+              spec:spec, unit:'支', packQty:1, 
+              low:appState.settings.defaultLow, emoji:'🍢'
+            });
+            added++;
+          }
+        }
+      }
+      continue;
+    }
+    
+    // 兼容传统格式：产品名, 售价, 分类
+    if (line.indexOf(',') > -1 || line.indexOf('，') > -1) {
+      var parts = line.split(/[,，\t]/).map(function(s) { return s.trim(); });
+      var name = parts[0]; if (!name) continue;
+      if (!appState.products.some(function(p) { return p.name === name; })) {
+        var price = parseFloat(parts[1]) || 0.50;
+        var cat = parts[2] || currentCat;
+        if (appState.settings.categories.indexOf(cat) === -1) appState.settings.categories.push(cat);
+        appState.products.push({
+          id:'p_' + Date.now() + '_' + added, name:name, price:price, unitCost:0, packCost:0, initialStock:null, initDate:getLocalDate(0), cat:cat,
+          spec:'1 stick', unit:'支', packQty:1, low:appState.settings.defaultLow, emoji:'🍢'
+        });
+        added++;
+      }
+    }
+  }
+  
+  if (added === 0) return toast('没有解析到有效产品，请确认复制了正确的内容');
+  
+  addLog('批量新增', '智能解析并批量添加了 ' + added + ' 个产品');
   saveStore(); closeModal(); render(); toast('成功批量添加 ' + added + ' 个产品！');
 }
 function openWaModal() {
@@ -1392,16 +1449,14 @@ function loadPresetList() {
   saveStore(); render(); toast(added ? ('已载入 ' + added + ' 项产品') : '已存在');
 }
 
-// ================= 【核心修复 3】一键迁移旧数据 =================
+// ================= 【核心修复 3】一键迁移本地旧数据 =================
 function migrateOldData() {
   if (!confirm('系统将尝试从本机浏览器缓存中寻找旧版数据，找到后会自动合并，是否继续？')) return;
   
   var keys = ['dc_v8_products', 'dc_v7_products', 'dc_v6_products', 'dc_v5_products', 'dc_v4_products', 'dc_v3_products', 'dc_v2_products', 'dc_v2_settings'];
   var foundProducts = null;
   var foundRecords = null;
-  var foundSettings = null;
   
-  // 遍历找最全的产品数据
   keys.forEach(function(k) {
     var d = localStorage.getItem(k);
     if (d) {
@@ -1414,7 +1469,6 @@ function migrateOldData() {
     }
   });
 
-  // 找记录数据
   ['dc_v8_records', 'dc_v7_records', 'dc_v6_records', 'dc_v5_records', 'dc_v4_records', 'dc_v3_records', 'dc_v2_records'].forEach(function(k) {
     var d = localStorage.getItem(k);
     if (d && !foundRecords) {
@@ -1426,7 +1480,7 @@ function migrateOldData() {
   });
 
   if (!foundProducts) {
-    return toast('未在本地找到旧版产品数据，你可能需要导入 JSON 备份。');
+    return toast('未在本地找到旧版产品数据，推荐使用【批量粘贴】功能。');
   }
 
   if (!confirm('找到旧版数据！共计 ' + foundProducts.length + ' 个产品。\n是否立即合并到新系统？（不会覆盖你当前已有的产品）')) return;
@@ -1434,7 +1488,6 @@ function migrateOldData() {
   var added = 0;
   foundProducts.forEach(function(oldP) {
     if (!appState.products.some(function(p) { return p.name === oldP.name; })) {
-      // 转换老版本字段并补齐新字段
       var newP = Object.assign({}, oldP);
       if (newP.packQty === undefined) newP.packQty = 1;
       if (newP.packCost === undefined) newP.packCost = 0;
@@ -1447,14 +1500,13 @@ function migrateOldData() {
   });
 
   if (foundRecords) {
-    // 合并历史记录（以新系统没有的日期为准）
     for (var d in foundRecords) {
       if (d === '__status') continue;
       if (!appState.records[d]) appState.records[d] = foundRecords[d];
     }
   }
 
-  addLog('系统迁移', '一键迁移了旧版数据，新增 ' + added + ' 个产品');
+  addLog('系统迁移', '一键迁移了本地旧版数据，新增 ' + added + ' 个产品');
   saveStore();
   render();
   toast('旧版数据迁移成功！新增 ' + added + ' 个产品');
@@ -1502,6 +1554,20 @@ function exportJsonBackup() {
   a.click();
   addLog('备份数据', '汇出了系统备份');
   toast('备份已下载');
+}
+
+// 修复调起相机的致命问题
+function triggerImportJson() {
+  var fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.json,application/json';
+  fileInput.style.display = 'none';
+  fileInput.onchange = function(e) {
+    importJsonBackup(e);
+  };
+  document.body.appendChild(fileInput);
+  fileInput.click();
+  setTimeout(function() { document.body.removeChild(fileInput); }, 1000);
 }
 
 function importJsonBackup(e) {
