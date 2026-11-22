@@ -11,7 +11,6 @@
 --bg: #0f1115; --surface: #181b21; --surface-2: #22262f; --border: #2c313d;
 --text: #f3f4f6; --muted: #9ca3af; --blue: #2563eb; --blue-light: #3b82f6;
 --red-bg: rgba(239, 68, 68, 0.16); --red-text: #f87171; --green-text: #34d399;
---amber: #f59e0b;
 }
 body.light-mode {
 --bg: #f3f4f6; --surface: #ffffff; --surface-2: #e5e7eb; --border: #d1d5db;
@@ -156,6 +155,15 @@ padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; opaci
 .calc-item.red { color: var(--red-text); }
 .log-list { font-size: 12px; color: var(--muted); line-height: 1.8; max-height: 200px; overflow-y: auto; }
 .log-item { border-bottom: 1px solid var(--border); padding: 6px 0; }
+
+/* 搜索框包裹器与清空按钮 */
+.search-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
+.search-wrapper input { padding-right: 35px; }
+.clear-btn {
+  position: absolute; right: 10px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--border); color: var(--text); display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; border: none;
+}
 </style>
 </head>
 <body>
@@ -262,9 +270,16 @@ if (appState.settings.theme === 'light') {
   document.body.classList.add('light-mode');
 }
 
+// 【核心修复 1】营业日跨天逻辑
 function getLocalDate(offset) {
   offset = offset || 0;
   var d = new Date();
+  
+  // 如果当前时间在凌晨 0:00 到 5:00 之间，算作前一天的营业日
+  if (d.getHours() < 5) {
+    d.setDate(d.getDate() - 1);
+  }
+  
   d.setDate(d.getDate() + offset);
   var tz = d.getTimezoneOffset() * 60000;
   return new Date(d.getTime() - tz).toISOString().split('T')[0];
@@ -335,7 +350,6 @@ function getStartStock(p, dateStr) {
   var prev = getLastRecordBefore(p.id, dateStr);
   if (prev) return { val: prev.rem, label: '上次 ' + formatCnDate(prev.date) };
   
-  // 严格判断：只有 null/undefined/'' 才算未初始化
   if (p.initialStock === undefined || p.initialStock === null || p.initialStock === '') {
     return { val: 0, label: '未设期初', notInit: true }; 
   }
@@ -378,7 +392,6 @@ function calcDayStats(dateStr) {
       var curRem = Number(r.rem);
       if (curRem <= p.low) lowStockCount++;
       
-      // 成本快照容错
       var unitCost = (r.costSnapshot !== undefined && r.costSnapshot > 0) ? Number(r.costSnapshot) : getUnitCost(p);
       if (r.costSnapshot === undefined && getUnitCost(p) > 0) r.costSnapshot = getUnitCost(p);
       
@@ -388,7 +401,6 @@ function calcDayStats(dateStr) {
       var sold = startData.val + pq - Number(r.waste || 0) - curRem;
       if (sold > 0) { 
         soldCount += sold; 
-        // 售价快照容错
         var pPrice = (r.priceSnapshot !== undefined) ? Number(r.priceSnapshot) : p.price;
         if (r.priceSnapshot === undefined) r.priceSnapshot = p.price;
         salesAmt += sold * pPrice; 
@@ -396,7 +408,6 @@ function calcDayStats(dateStr) {
     }
     if (r && Number(r.waste) > 0) {
       wasteCount += Number(r.waste);
-      // 损耗成本快照，如果是 0 说明当时没成本，现在补上
       var wCost = Number(r.waste) * getUnitCost(p);
       if (r.wasteCost === undefined || r.wasteCost === 0) {
         r.wasteCost = wCost;
@@ -427,6 +438,17 @@ function render() {
   else if (appState.tab === 'stats') main.innerHTML = viewStats();
   else if (appState.tab === 'products') main.innerHTML = viewProducts();
   else if (appState.tab === 'settings') main.innerHTML = viewSettings();
+
+  // 【核心修复 2】恢复搜索框焦点（只对当前活动的搜索框生效）
+  setTimeout(function(){
+    var input = document.getElementById('mainSearchInput');
+    if (input && document.activeElement !== input && appState.search !== '') {
+      input.focus();
+      var val = input.value;
+      input.value = '';
+      input.value = val;
+    }
+  }, 10);
 }
 
 /* ================= 盘点页 ================= */
@@ -479,7 +501,10 @@ function viewCount() {
 
   html += '<div style="display:flex;gap:8px;align-items:center;">' +
     '<button class="btn btn-dark btn-sm" onclick="toggleCollapseAll()">' + (allExpanded ? '全部收起' : '全部展开') + '</button>' +
-    '<input type="text" placeholder="🔍 搜索产品… (按回车)" value="' + esc(appState.search) + '" onchange="setSearch(this.value)" onkeydown="if(event.key===\'Enter\') this.blur();" style="flex:1;">' +
+    '<div class="search-wrapper">' +
+      '<input type="text" id="mainSearchInput" placeholder="🔍 搜索产品…" value="' + esc(appState.search) + '" oninput="handleSearch(this.value)" style="flex:1;">' +
+      (appState.search ? '<button class="clear-btn" onclick="clearSearch()">✕</button>' : '') +
+    '</div>' +
   '</div>';
 
   html += '<div class="pills-row">' +
@@ -635,7 +660,10 @@ function viewPurchase() {
   '</div>';
 
   html += '<div style="display:flex;gap:8px;align-items:center;">' +
-    '<input type="text" placeholder="🔍 搜索产品… (按回车)" value="' + esc(appState.search) + '" onchange="setSearch(this.value)" onkeydown="if(event.key===\'Enter\') this.blur();" style="flex:1;">' +
+    '<div class="search-wrapper">' +
+      '<input type="text" id="mainSearchInput" placeholder="🔍 搜索产品…" value="' + esc(appState.search) + '" oninput="handleSearch(this.value)" style="flex:1;">' +
+      (appState.search ? '<button class="clear-btn" onclick="clearSearch()">✕</button>' : '') +
+    '</div>' +
   '</div>';
 
   html += '<div class="pills-row">' +
@@ -724,14 +752,12 @@ function setPurchaseUnit(pid, u) {
     var packQty = Number(p.packQty) || 1;
     
     rec.purchase.unit = u;
-    // 核心修复：自动换算数量
     if (u === 'stick' && oldUnit === 'pack') {
       rec.purchase.inputQty = oldQty * packQty;
     } else if (u === 'pack' && oldUnit === 'stick') {
       rec.purchase.inputQty = Math.round(oldQty / packQty * 100) / 100;
     }
     
-    // 核心修复：切换时自动带出默认成本
     rec.purchase.inputCost = u === 'pack' ? (Number(p.packCost) || 0) : (getUnitCost(p) || 0);
     
     updatePurchaseCalc(pid); 
@@ -748,7 +774,7 @@ function updatePurchase(pid, field, val) {
   if (!rec.purchase) rec.purchase = { inputQty:0, unit:'pack', qty:0, inputCost:0, unitCost:0, totalCost:0 };
 
   var numVal = Number(val);
-  if (isNaN(numVal) || numVal < 0) numVal = 0; // 拦截负数和非数字
+  if (isNaN(numVal) || numVal < 0) numVal = 0;
 
   if (field === 'inputQty') {
     rec.purchase.inputQty = numVal;
@@ -855,7 +881,10 @@ function viewProducts() {
       '<button class="btn btn-blue btn-sm" onclick="openProdEditor()">+ 新增产品</button>' +
     '</div>' +
     '<div style="margin-bottom:12px;">' +
-      '<input type="text" placeholder="🔍 搜索产品… (按回车)" value="' + esc(appState.search) + '" onchange="setSearch(this.value)" onkeydown="if(event.key===\'Enter\') this.blur();">' +
+      '<div class="search-wrapper">' +
+        '<input type="text" id="mainSearchInput" placeholder="🔍 搜索产品…" value="' + esc(appState.search) + '" oninput="handleSearch(this.value)">' +
+        (appState.search ? '<button class="clear-btn" onclick="clearSearch()">✕</button>' : '') +
+      '</div>' +
     '</div>' + rows;
 }
 
@@ -907,10 +936,16 @@ function viewSettings() {
         '<button class="btn btn-blue btn-full" onclick="saveSettingsNow()">保存设定</button>' +
       '</div>' +
     '</div>' +
+    // 【核心修复 3】一键迁移旧数据
+    '<div class="card" style="border-color:var(--blue-light);">' +
+      '<div class="card-hd" style="color:var(--blue-light);">🪄 旧版系统数据一键迁移</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">如果你以前在这个手机用过旧版的库存系统，点下方按钮可以自动把旧版数据（产品、历史记录）直接搬过来！</div>' +
+      '<button class="btn btn-blue btn-full" onclick="migrateOldData()">一键找回并导入旧版数据</button>' +
+    '</div>' +
     '<div class="card">' +
       '<div class="card-hd">产品清单（自动 / 批量添加）</div>' +
       '<div style="display:flex;gap:8px;">' +
-        '<button class="btn btn-blue btn-full" onclick="loadPresetList()">载入全部预设产品</button>' +
+        '<button class="btn btn-blue btn-full" onclick="loadPresetList()">载入预设产品</button>' +
         '<button class="btn btn-dark btn-full" onclick="openBatchAddModal()">⚡ 批量粘贴新增</button>' +
       '</div>' +
     '</div>' +
@@ -933,7 +968,6 @@ function viewSettings() {
 
 function switchTab(t) { appState.tab = t; appState.search = ''; render(); window.scrollTo(0, 0); }
 function changeDate(d) { appState.date = d; render(); }
-function setSearch(q) { appState.search = q; render(); }
 function selectCat(c) { appState.selectedCat = c; render(); }
 
 function toggleCat(c) {
@@ -955,6 +989,21 @@ function toggleCollapseAll() {
   render();
 }
 
+// 【核心修复 2】搜索防抖与焦点保持
+var searchTimer = null;
+function handleSearch(q) {
+  appState.search = q;
+  if (searchTimer) clearTimeout(searchTimer);
+  // 延迟 300 毫秒渲染，防止打字卡顿和频闪
+  searchTimer = setTimeout(function() {
+    render();
+  }, 300);
+}
+function clearSearch() {
+  appState.search = '';
+  render();
+}
+
 function updateRec(pid, field, val) {
   if (!isDateEditable(appState.date)) return toast('已锁定或历史日期不可修改');
   if (!appState.records[appState.date]) appState.records[appState.date] = {};
@@ -968,7 +1017,7 @@ function updateRec(pid, field, val) {
     if (val === '') rec.rem = '';
     else {
       var num = Number(val);
-      rec.rem = isNaN(num) || num < 0 ? 0 : num; // 拦截负数
+      rec.rem = isNaN(num) || num < 0 ? 0 : num;
     }
   }
   else if (field === 'waste') {
@@ -984,7 +1033,6 @@ function updateRec(pid, field, val) {
     rec.wasteReason = val;
   }
 
-  // 每次修改都保存当时的售价和成本快照
   rec.priceSnapshot = p.price;
   rec.costSnapshot = getUnitCost(p);
   
@@ -1344,8 +1392,75 @@ function loadPresetList() {
   saveStore(); render(); toast(added ? ('已载入 ' + added + ' 项产品') : '已存在');
 }
 
-// ================= 核心：安全导出与导入 =================
+// ================= 【核心修复 3】一键迁移旧数据 =================
+function migrateOldData() {
+  if (!confirm('系统将尝试从本机浏览器缓存中寻找旧版数据，找到后会自动合并，是否继续？')) return;
+  
+  var keys = ['dc_v8_products', 'dc_v7_products', 'dc_v6_products', 'dc_v5_products', 'dc_v4_products', 'dc_v3_products', 'dc_v2_products', 'dc_v2_settings'];
+  var foundProducts = null;
+  var foundRecords = null;
+  var foundSettings = null;
+  
+  // 遍历找最全的产品数据
+  keys.forEach(function(k) {
+    var d = localStorage.getItem(k);
+    if (d) {
+      try {
+        var parsed = JSON.parse(d);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          if (!foundProducts || parsed.length > foundProducts.length) foundProducts = parsed;
+        }
+      } catch(e) {}
+    }
+  });
 
+  // 找记录数据
+  ['dc_v8_records', 'dc_v7_records', 'dc_v6_records', 'dc_v5_records', 'dc_v4_records', 'dc_v3_records', 'dc_v2_records'].forEach(function(k) {
+    var d = localStorage.getItem(k);
+    if (d && !foundRecords) {
+      try {
+        var parsed = JSON.parse(d);
+        if (typeof parsed === 'object') foundRecords = parsed;
+      } catch(e) {}
+    }
+  });
+
+  if (!foundProducts) {
+    return toast('未在本地找到旧版产品数据，你可能需要导入 JSON 备份。');
+  }
+
+  if (!confirm('找到旧版数据！共计 ' + foundProducts.length + ' 个产品。\n是否立即合并到新系统？（不会覆盖你当前已有的产品）')) return;
+
+  var added = 0;
+  foundProducts.forEach(function(oldP) {
+    if (!appState.products.some(function(p) { return p.name === oldP.name; })) {
+      // 转换老版本字段并补齐新字段
+      var newP = Object.assign({}, oldP);
+      if (newP.packQty === undefined) newP.packQty = 1;
+      if (newP.packCost === undefined) newP.packCost = 0;
+      if (newP.unitCost === undefined) newP.unitCost = newP.packCost / newP.packQty;
+      if (newP.initialStock === undefined) newP.initialStock = null;
+      if (newP.initDate === undefined) newP.initDate = getLocalDate(0);
+      appState.products.push(newP);
+      added++;
+    }
+  });
+
+  if (foundRecords) {
+    // 合并历史记录（以新系统没有的日期为准）
+    for (var d in foundRecords) {
+      if (d === '__status') continue;
+      if (!appState.records[d]) appState.records[d] = foundRecords[d];
+    }
+  }
+
+  addLog('系统迁移', '一键迁移了旧版数据，新增 ' + added + ' 个产品');
+  saveStore();
+  render();
+  toast('旧版数据迁移成功！新增 ' + added + ' 个产品');
+}
+
+// ================= 导出与导入 =================
 function exportExcelCsv() {
   if (!appState.products.length) return toast('暂无产品资料');
   
@@ -1396,18 +1511,15 @@ function importJsonBackup(e) {
     try {
       var d = JSON.parse(ev.target.result);
       
-      // 1. 结构严格校验
       if (!d.products || !Array.isArray(d.products)) throw new Error('产品数据结构损坏');
       if (!d.records || typeof d.records !== 'object') throw new Error('盘点记录结构损坏');
       
-      // 2. 提示自动备份当前数据
       if (confirm('导入前，系统将自动为您导出当前数据的备份，是否继续？')) {
         exportJsonBackup();
       } else {
         return;
       }
 
-      // 3. 覆盖并兼容处理
       appState.products = d.products.map(function(p) {
         var newP = Object.assign({}, p);
         if (newP.packQty === undefined || isNaN(newP.packQty)) newP.packQty = 1;
@@ -1415,7 +1527,6 @@ function importJsonBackup(e) {
         if (newP.unitCost === undefined || isNaN(newP.unitCost)) {
           newP.unitCost = newP.packQty > 0 ? newP.packCost / newP.packQty : 0;
         }
-        // 旧数据兼容：如果没有期初标记，强制置为 null 让其重新设置
         if (newP.initialStock === undefined) newP.initialStock = null;
         if (newP.initDate === undefined) newP.initDate = getLocalDate(0);
         return newP;
